@@ -1,9 +1,6 @@
 name: Healthz integration test
 run-name: Integration test for healthz endpoint
-on:
-  pull_request:
-    branches:
-      - main
+on: [pull_request]
       
 jobs:
   Run-Integration-test-for-healthz:
