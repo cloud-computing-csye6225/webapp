@@ -31,6 +31,7 @@ jobs:
           echo DBPORT="5433" >> .env
           echo SERVERPORT=":8080" >> .env
           cat .env
+          ls -la
 
       - name: Set up PostgreSQL
         run: |
@@ -38,3 +39,6 @@ jobs:
           sudo apt-get install postgresql postgresql-client
           sudo service postgresql start
           pg_isready
+
+      - name: run integration test
+        run: go test ./integration_tests/
