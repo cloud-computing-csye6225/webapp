@@ -21,5 +21,20 @@ jobs:
       - name: Check Go version
         run: go version
 
-#      - name: Run go tests
-#        run: go test ./...
+      - name: Set .env file
+        run: |
+          touch .env
+          echo DBHOST="localhost" >> .env
+          echo DBUSER="postgres" >> .env
+          echo DBPASSWORD="postgres" >> .env
+          echo DBNAME="postgres" >> .env
+          echo DBPORT="5433" >> .env
+          echo SERVERPORT=":8080" >> .env
+          cat .env
+
+      - name: Set up PostgreSQL
+        run: |
+          sudo apt-get update
+          sudo apt-get install postgresql postgresql-client
+          sudo service postgresql start
+          pg_isready
