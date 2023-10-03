@@ -4,43 +4,15 @@ import (
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
-	"io"
-	"net/http"
 	"webapp/config"
 	"webapp/db"
+	"webapp/routes"
 )
 
 func SetupGinRouter(db db.Database) *gin.Engine {
 	r := gin.Default()
-
-	r.Any("/healthz", func(context *gin.Context) {
-		context.Header("Cache-Control", "no-store, no-cache, must-revalidate;")
-		if context.Request.Method == http.MethodGet {
-			querystring := context.Request.URL.RawQuery
-			all, err := io.ReadAll(context.Request.Body)
-			if err != nil {
-				fmt.Printf("Error while reading the body %s\n", err)
-			}
-			if querystring != "" || len(all) > 0 {
-				context.String(http.StatusBadRequest, "")
-			} else {
-				err := db.Ping()
-				if err != nil {
-					context.String(http.StatusServiceUnavailable, "")
-					return
-				}
-				context.String(http.StatusOK, "")
-			}
-		} else {
-			context.String(http.StatusMethodNotAllowed, "")
-
-		}
-	})
-
-	r.NoRoute(func(context *gin.Context) {
-		context.Header("Cache-Control", "no-store, no-cache, must-revalidate;")
-		context.String(http.StatusNotFound, "")
-	})
+	r.NoRoute(routes.NoRouteHandler)
+	r.Any("/healthz", routes.HealthzGetReqHandler(db))
 	return r
 }
 
