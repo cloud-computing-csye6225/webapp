@@ -1,9 +1,25 @@
 name: Healthz integration test
-run-name: Integration test for healthz endpoint
 on: [pull_request]
-      
+
 jobs:
   Run-Integration-test-for-healthz:
     runs-on: ubuntu-latest
     steps:
-      - run: echo "Hello World!!!"
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: '1.19'
+          check-latest: true
+
+      - name: Install dependencies
+        run: |
+          go mod download
+
+      - name: Check Go version
+        run: go version
+
+      - name: Run go tests
+        run: go test ./...

@@ -8,7 +8,7 @@ import (
 	"net/http/httptest"
 	"strings"
 	"testing"
-	"venkatpavan_munaganti_002722397_2/config"
+	"webapp/config"
 )
 
 type MockDB struct {

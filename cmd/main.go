@@ -6,8 +6,8 @@ import (
 	"github.com/joho/godotenv"
 	"io"
 	"net/http"
-	"venkatpavan_munaganti_002722397_2/config"
-	"venkatpavan_munaganti_002722397_2/db"
+	"webapp/config"
+	"webapp/db"
 )
 
 func SetupGinRouter(db db.Database) *gin.Engine {
