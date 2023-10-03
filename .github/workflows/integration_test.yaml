@@ -28,7 +28,7 @@ jobs:
           echo DBUSER="pguser" >> .env
           echo DBPASSWORD="pguser" >> .env
           echo DBNAME="csye6225_db" >> .env
-          echo DBPORT="5433" >> .env
+          echo DBPORT="5432" >> .env
           echo SERVERPORT=":8080" >> .env
           cat .env
           ls -la
@@ -46,6 +46,7 @@ jobs:
           source .env
           sudo -u postgres psql --command="CREATE USER $DBUSER PASSWORD '$DBPASSWORD'" --command="\du"
           sudo -u postgres psql --command="CREATE DATABASE $DBNAME OWNER $DBUSER" --command="\l"
+          PGPASSWORD=$DBPASSWORD psql -U $DBUSER -d $DBNAME -h $DBHOST -p $DBPORT
 
       - name: run integration test
         run: go test ./integration_tests/
