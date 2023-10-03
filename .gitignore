@@ -22,3 +22,6 @@ go.work
 
 # Ignore .env files
 .env
+
+# Ignore goland config files
+.idea

@@ -1,4 +1,4 @@
-module venkatpavan_munaganti_002722397_2
+module webapp
 
 go 1.19
 

@@ -5,7 +5,7 @@ import (
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
-	"venkatpavan_munaganti_002722397_2/config"
+	"webapp/config"
 )
 
 type Database interface {
