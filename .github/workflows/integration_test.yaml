@@ -1,0 +1,12 @@
+name: Healthz integration test
+run-name: Integration test for healthz endpoint
+on:
+  pull_request:
+    branches:
+      - main
+      
+jobs:
+  Run-Integration-test-for-healthz:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "Hello World!!"
