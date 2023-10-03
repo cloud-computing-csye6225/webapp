@@ -25,9 +25,9 @@ jobs:
         run: |
           touch .env
           echo DBHOST="localhost" >> .env
-          echo DBUSER="postgres" >> .env
-          echo DBPASSWORD="postgres" >> .env
-          echo DBNAME="postgres" >> .env
+          echo DBUSER="pguser" >> .env
+          echo DBPASSWORD="pguser" >> .env
+          echo DBNAME="csye6225_db" >> .env
           echo DBPORT="5433" >> .env
           echo SERVERPORT=":8080" >> .env
           cat .env
@@ -39,6 +39,13 @@ jobs:
           sudo apt-get install postgresql postgresql-client
           sudo service postgresql start
           pg_isready
+
+      - name: Create PG user and database
+        run: |
+          # Load environment variables from .env file
+          source .env
+          sudo -u postgres psql --command="CREATE USER $DBUSER PASSWORD '$DBPASSWORD'" --command="\du"
+          sudo -u postgres psql --command="CREATE DATABASE $DBNAME OWNER $DBUSER" --command="\l"
 
       - name: run integration test
         run: go test ./integration_tests/
