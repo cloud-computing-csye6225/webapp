@@ -37,6 +37,7 @@ func loadDefaultAccounts(defaultUsers config.DefaultUsers, s services.APIService
 		fmt.Println("Error opening file:", err)
 		return
 	}
+
 	defer func(file *os.File) {
 		err := file.Close()
 		if err != nil {
@@ -62,25 +63,30 @@ func loadDefaultAccounts(defaultUsers config.DefaultUsers, s services.APIService
 			return
 		}
 
-		// Process the CSV record (record is a []string)
-		// You can access individual fields by index, e.g., record[0], record[1], etc.
-		fmt.Println(record)
 		passwordHash, hashError := s.AccountsService.HashPassword(record[3])
 		if hashError != nil {
 			fmt.Printf("Hashing password failed,\t%s\n", hashError)
 		} else {
-			account := models.Account{
-				FirstName: record[0],
-				LastName:  record[1],
-				Email:     record[2],
-				Password:  passwordHash,
+			account, accountFindError := s.AccountsService.GetAccountByEmail(record[2])
+
+			if accountFindError != nil {
+				fmt.Printf("Account does not exists,\t%s\n", accountFindError)
+				fmt.Println("Creating new account")
+				account = models.Account{
+					FirstName: record[0],
+					LastName:  record[1],
+					Email:     record[2],
+					Password:  passwordHash,
+				}
+				accountCreationError := s.AccountsService.AddAccount(account)
+				if accountCreationError != nil {
+					fmt.Printf("Failed creating a default account,\t%s\n", accountCreationError)
+					continue
+				}
+				fmt.Printf("Successfully created a default account for %s\n", record[0])
+			} else {
+				fmt.Printf("Account already exists, \t%s\n", account)
 			}
-			accountCreationError := s.AccountsService.AddAccount(account)
-			if accountCreationError != nil {
-				fmt.Printf("Failed creating a default account,\t%s\n", accountCreationError)
-				continue
-			}
-			fmt.Printf("Successfully created a default account for %s", record[0])
 		}
 	}
 }

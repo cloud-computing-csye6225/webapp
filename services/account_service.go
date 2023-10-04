@@ -25,6 +25,16 @@ func (as AccountsService) AddAccount(account models.Account) error {
 	return nil
 }
 
+func (as AccountsService) GetAccountByEmail(email string) (models.Account, error) {
+	var account models.Account
+
+	if err := as.db.Where("email= ?", email).First(&account).Error; err != nil {
+		fmt.Printf("Failed to get an Account, %s\n", err)
+		return account, err
+	}
+	return account, nil
+}
+
 func (as AccountsService) GetAccountByID(accountID string) (models.Account, error) {
 	var account models.Account
 
