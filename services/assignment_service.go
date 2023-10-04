@@ -15,7 +15,7 @@ func NewAssignmentService(db *db.PostgresDB) *AssignmentService {
 	return &AssignmentService{db.GetConnection()}
 }
 
-func (as AssignmentService) AddAssignment(assignment models.Assignment) error {
+func (as AssignmentService) AddAssignment(assignment *models.Assignment) error {
 	err := as.db.Create(&assignment).Error
 	if err != nil {
 		fmt.Printf("Failed to create an Assignment, %s\n", err)
@@ -52,25 +52,24 @@ func (as AssignmentService) DeleteAssignment(assignment models.Assignment) error
 	return nil
 }
 
-func (as AssignmentService) UpdateAssignment(assignment models.Assignment) error {
+func (as AssignmentService) UpdateAssignment(assignment models.Assignment) (models.Assignment, error) {
 	oldAssignment, err := as.GetAssignmentByID(assignment.ID)
 	if err != nil {
 		fmt.Printf("Failed to get assignment with ID %s to delete, %s\n", assignment.ID, err)
-		return err
+		return oldAssignment, err
 	} else {
 		updateError := as.db.Model(&oldAssignment).Updates(models.Assignment{
-			Name:              assignment.Name,
-			Points:            assignment.Points,
-			NumOfAttempts:     assignment.NumOfAttempts,
-			Deadline:          assignment.Deadline,
-			AccountID:         assignment.AccountID,
-			AssignmentCreated: assignment.AssignmentCreated,
+			Name:          assignment.Name,
+			Points:        assignment.Points,
+			NumOfAttempts: assignment.NumOfAttempts,
+			Deadline:      assignment.Deadline,
+			AccountID:     assignment.AccountID,
 		}).Error
 
 		if updateError != nil {
 			fmt.Printf("Failed to update the assignment, %s\n", err)
-			return updateError
+			return oldAssignment, updateError
 		}
 	}
-	return nil
+	return oldAssignment, err
 }
