@@ -8,16 +8,15 @@ import (
 	"io"
 	"os"
 	"webapp/config"
-	"webapp/db"
 	"webapp/models"
 	"webapp/routes"
 	"webapp/services"
 )
 
-func SetupGinRouter(db db.Database) *gin.Engine {
+func SetupGinRouter(services services.APIServices) *gin.Engine {
 	r := gin.Default()
 	r.NoRoute(routes.NoRouteHandler)
-	r.Any("/healthz", routes.HealthzGetReqHandler(db))
+	r.Any("/healthz", routes.HealthzGetReqHandler(services.Database))
 	return r
 }
 
@@ -98,7 +97,7 @@ func main() {
 	//Load default accounts
 	loadDefaultAccounts(configs.DefaultUsers, s)
 
-	r := SetupGinRouter(s.Database)
+	r := SetupGinRouter(s)
 
 	err := r.Run(configs.ServerConfig.Host)
 	if err != nil {

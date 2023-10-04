@@ -11,7 +11,7 @@ type Services interface {
 }
 
 type APIServices struct {
-	Database          *db.PostgresDB
+	Database          db.Database
 	AccountsService   *AccountsService
 	AssignmentService *AssignmentService
 }

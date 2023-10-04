@@ -9,6 +9,7 @@ import (
 	"strings"
 	"testing"
 	"webapp/config"
+	"webapp/services"
 )
 
 type MockDB struct {
@@ -38,7 +39,10 @@ func (m *MockDB) Ping() error {
 
 func TestHealthzRouteWithGET(t *testing.T) {
 	mockDB := &MockDB{}
-	router := SetupGinRouter(mockDB)
+	apiServices := services.APIServices{
+		Database: mockDB,
+	}
+	router := SetupGinRouter(apiServices)
 
 	testsCases := []struct {
 		Name          string
@@ -100,7 +104,10 @@ func TestHealthzRouteWithGET(t *testing.T) {
 
 func TestHealthzRouteWithUnAllowedRequests(t *testing.T) {
 	mockDB := &MockDB{}
-	router := SetupGinRouter(mockDB)
+	apiServices := services.APIServices{
+		Database: mockDB,
+	}
+	router := SetupGinRouter(apiServices)
 
 	testcases := []struct {
 		Name          string
@@ -138,7 +145,10 @@ func TestHealthzRouteWithUnAllowedRequests(t *testing.T) {
 
 func TestForUnhandledRoute(t *testing.T) {
 	mockDB := &MockDB{}
-	router := SetupGinRouter(mockDB)
+	apiServices := services.APIServices{
+		Database: mockDB,
+	}
+	router := SetupGinRouter(apiServices)
 
 	t.Run("Test for unhandled route", func(t *testing.T) {
 		request := httptest.NewRequest(http.MethodGet, "/", nil)
