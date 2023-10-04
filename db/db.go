@@ -6,6 +6,7 @@ import (
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
 	"webapp/config"
+	"webapp/models"
 )
 
 type Database interface {
@@ -19,7 +20,24 @@ type PostgresDB struct {
 }
 
 func (p *PostgresDB) InitDatabase(cfg config.DatabaseConfig) error {
+	//Create database
 	dsn := fmt.Sprintf(
+		"host=%s user=%s password=%s port=%d",
+		cfg.DBHost,
+		cfg.DBUser,
+		cfg.DBPassword,
+		cfg.DBPort,
+	)
+	initDB, err := gorm.Open(postgres.Open(dsn), &gorm.Config{
+		Logger: logger.Default.LogMode(logger.Silent),
+	})
+
+	result := initDB.Exec(fmt.Sprintf("CREATE DATABASE %s", cfg.DBName))
+	if result.Error != nil {
+		fmt.Printf("Unable to create database\t%s\n", result.Error)
+	}
+
+	dsn = fmt.Sprintf(
 		"host=%s user=%s password=%s dbname=%s port=%d",
 		cfg.DBHost,
 		cfg.DBUser,
@@ -33,6 +51,11 @@ func (p *PostgresDB) InitDatabase(cfg config.DatabaseConfig) error {
 	})
 	if err == nil {
 		p.db = db
+		automigrateError := p.db.AutoMigrate(&models.Account{}, &models.Assignment{})
+		if automigrateError != nil {
+			fmt.Printf("Unable to automigrate schemas,\t%s\n", automigrateError)
+			return automigrateError
+		}
 	}
 	return err
 }
