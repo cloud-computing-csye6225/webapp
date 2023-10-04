@@ -17,13 +17,18 @@ type ServerConfig struct {
 	Host string
 }
 
+type DefaultUsers struct {
+	Path string
+}
+
 type Config struct {
 	DBConfig     DatabaseConfig
 	ServerConfig ServerConfig
+	DefaultUsers DefaultUsers
 }
 
-func GetConfigs() *Config {
-	return &Config{
+func GetConfigs() Config {
+	return Config{
 		DBConfig: DatabaseConfig{
 			DBUser:     getEnvVariable("DBUSER", ""),
 			DBPassword: getEnvVariable("DBPASSWORD", ""),
@@ -33,6 +38,9 @@ func GetConfigs() *Config {
 		},
 		ServerConfig: ServerConfig{
 			Host: getEnvVariable("SERVERPORT", ":8080"),
+		},
+		DefaultUsers: DefaultUsers{
+			Path: getEnvVariable("DEFAULTUSERS", ""),
 		},
 	}
 }
