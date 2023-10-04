@@ -37,23 +37,17 @@ func (as AssignmentService) GetAssignment() ([]models.Assignment, error) {
 func (as AssignmentService) GetAssignmentByID(assignmentID string) (models.Assignment, error) {
 	var assignment models.Assignment
 
-	if err := as.db.Where("id:= ?", assignmentID).First(&assignment).Error; err != nil {
+	if err := as.db.Where("id= ?", assignmentID).First(&assignment).Error; err != nil {
 		fmt.Printf("Failed to get an Assignment, %s\n", err)
 		return assignment, err
 	}
 	return assignment, nil
 }
 
-func (as AssignmentService) DeleteAssignment(assignmentID string) error {
-	assignment, err := as.GetAssignmentByID(assignmentID)
-	if err != nil {
-		fmt.Printf("Failed to get assignment with ID %s to delete, %s\n", assignmentID, err)
+func (as AssignmentService) DeleteAssignment(assignment models.Assignment) error {
+	if err := as.db.Delete(&assignment).Error; err != nil {
+		fmt.Printf("Failed to delete the assignment, %s\n", err)
 		return err
-	} else {
-		if deleteError := as.db.Delete(&assignment).Error; deleteError != nil {
-			fmt.Printf("Failed to delete the assignment, %s\n", err)
-			return err
-		}
 	}
 	return nil
 }

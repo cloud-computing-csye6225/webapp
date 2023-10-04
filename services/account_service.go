@@ -29,7 +29,7 @@ func (as AccountsService) GetAccountByEmail(email string) (models.Account, error
 	var account models.Account
 
 	if err := as.db.Where("email= ?", email).First(&account).Error; err != nil {
-		fmt.Printf("Failed to get an Account, %s\n", err)
+		fmt.Printf("Failed to get the Account, %s\n", err)
 		return account, err
 	}
 	return account, nil
