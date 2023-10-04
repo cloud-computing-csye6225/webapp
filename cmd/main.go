@@ -21,12 +21,12 @@ func SetupGinRouter(services services.APIServices) *gin.Engine {
 
 	v1 := r.Group("/v1")
 	{
-		v1.GET("/test", middleware.BasicAuth(services), routes.TestHandler(services))
-		v1.POST("/assignments", middleware.BasicAuth(services), routes.AssignmentsPostHandler(services))
+		v1.POST("/assignments", middleware.BasicAuth(services), middleware.ValidateAssignmentsPayload(services), routes.AssignmentsPostHandler(services))
 		v1.GET("/assignments/:id", middleware.BasicAuth(services), routes.AssignmentGetByIDHandler(services))
 		v1.GET("/assignments", middleware.BasicAuth(services), routes.AssignmentGetHandler(services))
-		v1.PUT("/assignments/:id", middleware.BasicAuth(services), routes.AssignmentPutHandler(services))
+		v1.PUT("/assignments/:id", middleware.BasicAuth(services), middleware.ValidateAssignmentsPayload(services), routes.AssignmentPutHandler(services))
 		v1.DELETE("/assignments/:id", middleware.BasicAuth(services), routes.AssignmentDeleteHandler(services))
+		v1.PATCH("/assignments/:id", middleware.BasicAuth(services), routes.AssignmentPatchHandler(services))
 	}
 
 	return r
