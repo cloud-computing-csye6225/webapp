@@ -8,6 +8,7 @@ import (
 	"io"
 	"os"
 	"webapp/config"
+	"webapp/middleware"
 	"webapp/models"
 	"webapp/routes"
 	"webapp/services"
@@ -17,6 +18,17 @@ func SetupGinRouter(services services.APIServices) *gin.Engine {
 	r := gin.Default()
 	r.NoRoute(routes.NoRouteHandler)
 	r.Any("/healthz", routes.HealthzGetReqHandler(services.Database))
+
+	v1 := r.Group("/v1")
+	{
+		v1.GET("/test", middleware.BasicAuth(services), routes.TestHandler(services))
+		v1.POST("/assignments", middleware.BasicAuth(services), routes.AssignmentsPostHandler(services))
+		v1.GET("/assignments/:id", middleware.BasicAuth(services), routes.AssignmentGetByIDHandler(services))
+		v1.GET("/assignments", middleware.BasicAuth(services), routes.AssignmentGetHandler(services))
+		v1.PUT("/assignments/:id", middleware.BasicAuth(services), routes.AssignmentPutHandler(services))
+		v1.DELETE("/assignments/:id", middleware.BasicAuth(services), routes.AssignmentDeleteHandler(services))
+	}
+
 	return r
 }
 
