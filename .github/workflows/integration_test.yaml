@@ -33,20 +33,20 @@ jobs:
           cat .env
           ls -la
 
-      - name: Set up PostgreSQL
-        run: |
-          sudo apt-get update
-          sudo apt-get install postgresql postgresql-client
-          sudo service postgresql start
-          pg_isready
+      # - name: Set up PostgreSQL
+      #   run: |
+      #     sudo apt-get update
+      #     sudo apt-get install postgresql postgresql-client
+      #     sudo service postgresql start
+      #     pg_isready
 
-      - name: Create PG user and database
-        run: |
-          # Load environment variables from .env file
-          source .env
-          sudo -u postgres psql --command="CREATE USER $DBUSER PASSWORD '$DBPASSWORD'" --command="\du"
-          sudo -u postgres psql --command="CREATE DATABASE $DBNAME OWNER $DBUSER" --command="\l"
-          PGPASSWORD=$DBPASSWORD psql -U $DBUSER -d $DBNAME -h $DBHOST -p $DBPORT
+      # - name: Create PG user and database
+      #   run: |
+      #     # Load environment variables from .env file
+      #     source .env
+      #     sudo -u postgres psql --command="CREATE USER $DBUSER PASSWORD '$DBPASSWORD'" --command="\du"
+      #     sudo -u postgres psql --command="CREATE DATABASE $DBNAME OWNER $DBUSER" --command="\l"
+      #     PGPASSWORD=$DBPASSWORD psql -U $DBUSER -d $DBNAME -h $DBHOST -p $DBPORT
 
       - name: run integration test
         run: go test ./integration_tests/
