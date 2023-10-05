@@ -30,7 +30,6 @@ jobs:
           echo DBNAME="csye6225_db" >> .env
           echo DBPORT="5432" >> .env
           echo SERVERPORT=":8080" >> .env
-          cat .env
           ls -la
 
       - name: Set up PostgreSQL
