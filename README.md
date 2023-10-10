@@ -32,3 +32,4 @@ Before you get started, ensure you have the following prerequisites installed on
    ```
 
 4. Start Postgres server if it is not active, and create required DB users & password if does not exists
+5. Run the application
