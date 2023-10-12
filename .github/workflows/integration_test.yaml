@@ -32,18 +32,18 @@ jobs:
           echo SERVERPORT=":8080" >> .env
           ls -la
 
-#      - name: Set up PostgreSQL
-#        run: |
-#          sudo apt-get update
-#          sudo apt-get install postgresql postgresql-client
-#          sudo service postgresql start
-#          pg_isready
-#
-#      - name: Updating database user
-#        run: |
-#          # Load environment variables from .env file
-#          source .env
-#          sudo -u postgres psql -c "ALTER ROLE $DBUSER WITH PASSWORD '$DBPASSWORD';"
+      - name: Set up PostgreSQL
+        run: |
+          sudo apt-get update
+          sudo apt-get install postgresql postgresql-client
+          sudo service postgresql start
+          pg_isready
+
+      - name: Updating database user
+        run: |
+          # Load environment variables from .env file
+          source .env
+          sudo -u postgres psql -c "ALTER ROLE $DBUSER WITH PASSWORD '$DBPASSWORD';"
 
       - name: run integration test
         run: go test ./integration_tests/
