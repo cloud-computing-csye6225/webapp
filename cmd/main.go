@@ -28,6 +28,7 @@ func SetupGinRouter(services services.APIServices) *gin.Engine {
 		v1.PUT("/assignments/:id", middleware.BasicAuth(services), middleware.ValidateAssignmentsPayload(services), routes.AssignmentPutHandler(services))
 		v1.DELETE("/assignments/:id", middleware.BasicAuth(services), routes.AssignmentDeleteHandler(services))
 		v1.PATCH("/assignments/:id", middleware.BasicAuth(services), routes.AssignmentPatchHandler(services))
+		v1.PATCH("/assignments/", middleware.BasicAuth(services), routes.AssignmentPatchHandler(services))
 	}
 
 	return r

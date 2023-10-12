@@ -61,7 +61,7 @@ func ValidateAssignmentsPayload(services services.APIServices) gin.HandlerFunc {
 		result, err := gojsonschema.Validate(schemaLoader, payloadLoader)
 		if err != nil {
 			fmt.Printf("Failed validating the schema, %v\n", err)
-			c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			return
 		}
 
