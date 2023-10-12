@@ -25,8 +25,8 @@ jobs:
         run: |
           touch .env
           echo DBHOST="localhost" >> .env
-          echo DBUSER="pguser" >> .env
-          echo DBPASSWORD="pguser" >> .env
+          echo DBUSER="postgres" >> .env
+          echo DBPASSWORD="postgres" >> .env
           echo DBNAME="csye6225_db" >> .env
           echo DBPORT="5432" >> .env
           echo SERVERPORT=":8080" >> .env
@@ -39,13 +39,11 @@ jobs:
           sudo service postgresql start
           pg_isready
 
-      - name: Create PG user and database
+      - name: Updating database user
         run: |
           # Load environment variables from .env file
           source .env
-          sudo -u postgres psql --command="CREATE USER $DBUSER PASSWORD '$DBPASSWORD'" --command="\du"
-          sudo -u postgres psql --command="CREATE DATABASE $DBNAME OWNER $DBUSER" --command="\l"
-          PGPASSWORD=$DBPASSWORD psql -U $DBUSER -d $DBNAME -h $DBHOST -p $DBPORT
+          sudo -u postgres psql -c "ALTER ROLE $DBUSER WITH PASSWORD '$DBPASSWORD';"
 
       - name: run integration test
         run: go test ./integration_tests/

@@ -30,5 +30,6 @@ Before you get started, ensure you have the following prerequisites installed on
     SERVERPORT= <API Server port, :8080 is default>
     DEFAULTUSERS= <Path to the default users file>
    ```
-
+   
 4. Start Postgres server if it is not active, and create required DB users & password if does not exists
+5. Run the application
