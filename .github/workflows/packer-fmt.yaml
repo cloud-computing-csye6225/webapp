@@ -8,6 +8,11 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: Setup build location
+        run: |
+          "mkdir builds"
+          "ls -la"
+
       - name: Setup `packer`
         uses: hashicorp/setup-packer@main
         id: setup
@@ -34,7 +39,4 @@ jobs:
           APP_DBPASSWORD: ${{ secrets.APP_DBPASSWORD }}
           APP_DBNAME: ${{ secrets.APP_DBNAME }}
           APP_DBPORT: ${{ secrets.APP_DBPORT }}
-        run: |
-          "mkdir builds"
-          "ls -la"
-          "packer validate ./packer/debian12-ami.pkr.hcl"
+        run: "packer validate ./packer/debian12-ami.pkr.hcl"
