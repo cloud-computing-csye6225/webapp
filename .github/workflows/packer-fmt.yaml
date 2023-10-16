@@ -10,8 +10,8 @@ jobs:
 
       - name: Setup build location
         run: |
-          "mkdir builds"
-          "ls -la"
+          mkdir builds
+          ls -la
 
       - name: Setup `packer`
         uses: hashicorp/setup-packer@main
