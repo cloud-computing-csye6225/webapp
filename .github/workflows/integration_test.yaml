@@ -2,7 +2,7 @@ name: Healthz integration test
 on: [pull_request]
 
 jobs:
-  Run-Integration-test-for-healthz:
+  integration-test:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
