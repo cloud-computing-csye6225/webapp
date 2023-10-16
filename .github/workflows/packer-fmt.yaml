@@ -1,8 +1,8 @@
-name: Packer fmt
+name: Packer fmt & validate
 on: [pull_request]
 
 jobs:
-  packer-fmt:
+  packer-fmt-validate:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
