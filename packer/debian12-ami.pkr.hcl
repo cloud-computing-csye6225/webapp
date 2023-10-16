@@ -27,37 +27,37 @@ variable "subnet_id" {
   default = "${env("PKR_AWS_SUBNET")}"
 }
 
-variable "app_dbhost"{
+variable "app_dbhost" {
   type    = string
   default = "${env("APP_DBHOST")}"
 }
 
-variable "app_dbuser"{
+variable "app_dbuser" {
   type    = string
   default = "${env("APP_DBUSER")}"
 }
 
-variable "app_dbpassword"{
+variable "app_dbpassword" {
   type    = string
   default = "${env("APP_DBPASSWORD")}"
 }
 
-variable "app_dbname"{
+variable "app_dbname" {
   type    = string
   default = "${env("APP_DBNAME")}"
 }
 
-variable "app_dbport"{
+variable "app_dbport" {
   type    = string
   default = "${env("APP_DBPORT")}"
 }
 
-variable "app_serverport"{
+variable "app_serverport" {
   type    = string
   default = "${env("APP_SERVERPORT")}"
 }
 
-variable "app_default_users"{
+variable "app_default_users" {
   type    = string
   default = "${env("APP_DEFAULTUSERS")}"
 }
