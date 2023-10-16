@@ -16,7 +16,7 @@ jobs:
 
       - name: Run `packer init`
         id: init
-        run: "packer init ./packer/debian12-ami.pkr.hcl"
+        run: "packer init -check ./packer/debian12-ami.pkr.hcl"
 
       - name: Run `packer validate`
         id: validate
