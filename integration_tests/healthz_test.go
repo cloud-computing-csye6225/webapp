@@ -3,31 +3,15 @@ package integration_tests
 import (
 	"fmt"
 	"github.com/gin-gonic/gin"
-	"github.com/joho/godotenv"
-	"log"
 	"net/http"
 	"net/http/httptest"
-	"os"
-	"regexp"
 	"testing"
 	"webapp/config"
 	"webapp/db"
 	"webapp/routes"
 )
 
-func loadEnv() {
-	const projectDirName = "webapp"
-	projectName := regexp.MustCompile(`^(.*` + projectDirName + `)`)
-	currentWorkDirectory, _ := os.Getwd()
-	rootPath := projectName.Find([]byte(currentWorkDirectory))
-	err := godotenv.Load(string(rootPath) + `/.env`)
-	if err != nil {
-		log.Fatalf("Error loading .env file")
-	}
-}
-
 func TestHealthzRouteWithGET(t *testing.T) {
-	loadEnv()
 	configs := config.GetConfigs()
 	pgDB := &db.PostgresDB{}
 	err := pgDB.InitDatabase(configs.DBConfig)
