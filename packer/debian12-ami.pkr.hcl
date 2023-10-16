@@ -120,4 +120,9 @@ build {
       "echo DEFAULTUSERS=${var.app_default_users}| sudo tee -a /etc/profile",
     ]
   }
+
+  provisioner "file" {
+    source = "./builds"
+    destination = "/tmp/"
+  }
 }
