@@ -28,8 +28,8 @@ variable "subnet_id" {
 }
 
 source "amazon-ebs" "webapp-ami" {
-  profile = "dev.admin"
-  region  = "${var.aws_region}"
+  profile         = "dev.admin"
+  region          = "${var.aws}"
   ami_name        = "csye6225_webapp_${formatdate("YYYY_MM_DD_hh_mm_ss", timestamp())}"
   ami_description = "AMI for CSYE6225 Webapp RestAPI"
   ami_regions = [
