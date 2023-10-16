@@ -21,6 +21,8 @@ jobs:
       - name: Run `packer build`
         id: build
         env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.PKR_AWS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.PKR_AWS_SECRET_KEY }}
           PKR_AWS_REGION: ${{ vars.PKR_AWS_REGION }}
           PKR_AWS_SRC_AMI: ${{ vars.PKR_AWS_SRC_AMI }}
           PKR_AWS_SSH_USERNAME: ${{ vars.PKR_AWS_SSH_USERNAME }}
