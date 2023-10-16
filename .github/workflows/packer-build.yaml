@@ -25,6 +25,9 @@ jobs:
         run: |
           go build ./cmd/main.go
           ls -la
+          mkdir builds
+          mv ./main /builds
+          ls -la ./builds
 
 #      - name: Setup `packer`
 #        uses: hashicorp/setup-packer@main
