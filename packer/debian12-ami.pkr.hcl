@@ -122,7 +122,7 @@ build {
   }
 
   provisioner "file" {
-    source = "./builds"
+    source      = "./builds"
     destination = "/tmp/"
   }
 }
