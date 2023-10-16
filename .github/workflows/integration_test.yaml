@@ -33,8 +33,6 @@ jobs:
           DBUSER: ${{ secrets.APP_DBUSER }}
           DBPASSWORD: ${{ secrets.APP_DBPASSWORD }}
         run: |
-          # Load environment variables from .env file
-          source .env
           sudo -u postgres psql -c "ALTER ROLE $DBUSER WITH PASSWORD '$DBPASSWORD';"
 
       - name: run integration test
