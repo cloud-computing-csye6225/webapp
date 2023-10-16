@@ -59,7 +59,7 @@ variable "app_serverport" {
 
 variable "app_default_users" {
   type    = string
-  default = "${env("APP_DEFAULTUSERS")}"
+  default = "${env("APP_DEFAULT_USERS_LOC")}"
 }
 
 
