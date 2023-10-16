@@ -39,4 +39,6 @@ jobs:
           APP_DBPASSWORD: ${{ secrets.APP_DBPASSWORD }}
           APP_DBNAME: ${{ secrets.APP_DBNAME }}
           APP_DBPORT: ${{ secrets.APP_DBPORT }}
+          APP_SERVERPORT: ${{ secrets.APP_SERVERPORT }}
+          APP_DEFAULT_USERS_LOC: ${{ secrets.APP_DEFAULT_USERS_LOC }}
         run: "packer validate ./packer/debian12-ami.pkr.hcl"
