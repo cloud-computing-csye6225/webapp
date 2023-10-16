@@ -21,17 +21,6 @@ jobs:
       - name: Check Go version
         run: go version
 
-      - name: Set .env file
-        run: |
-          touch .env
-          echo DBHOST="localhost" >> .env
-          echo DBUSER="postgres" >> .env
-          echo DBPASSWORD="postgres" >> .env
-          echo DBNAME="csye6225_db" >> .env
-          echo DBPORT="5432" >> .env
-          echo SERVERPORT=":8080" >> .env
-          ls -la
-
       - name: Set up PostgreSQL
         run: |
           sudo apt-get update
@@ -40,11 +29,20 @@ jobs:
           pg_isready
 
       - name: Updating database user
+        env:
+          DBUSER: ${{ secrets.APP_DBUSER }}
+          DBPASSWORD: ${{ secrets.APP_DBPASSWORD }}
         run: |
           # Load environment variables from .env file
           source .env
           sudo -u postgres psql -c "ALTER ROLE $DBUSER WITH PASSWORD '$DBPASSWORD';"
 
       - name: run integration test
+        env:
+          DBHOST: ${{ secrets.APP_DBHOST }}
+          DBUSER: ${{ secrets.APP_DBUSER }}
+          DBPASSWORD: ${{ secrets.APP_DBPASSWORD }}
+          DBNAME: ${{ secrets.APP_DBNAME }}
+          DBPORT: ${{ secrets.APP_DBPORT }}
         run: go test ./integration_tests/
 
