@@ -125,4 +125,14 @@ build {
     source      = "./builds"
     destination = "/tmp/"
   }
+
+  provisioner "shell" {
+    environment_vars = [
+      "DEBIAN_FRONTEND=noninteractive",
+      "CHECKPOINT_DISABLE=1",
+    ]
+    inline = [
+      "sudo mv /tmp/main /usr/"
+    ]
+  }
 }
