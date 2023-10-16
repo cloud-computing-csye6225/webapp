@@ -24,9 +24,9 @@ jobs:
       - name: Build application
         run: |
           go build ./cmd/main.go
-          ls -la
           mkdir builds
-          mv ./main /builds
+          ls -la
+          mv ./main .//builds
           ls -la ./builds
 
 #      - name: Setup `packer`
