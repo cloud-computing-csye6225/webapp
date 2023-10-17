@@ -122,7 +122,7 @@ build {
   }
 
   provisioner "file" {
-    source      = "./builds/"
+    source      = "./builds/webapp.tar"
     destination = "/tmp/"
   }
 
@@ -132,10 +132,8 @@ build {
       "CHECKPOINT_DISABLE=1",
     ]
     inline = [
-
-      "sudo mv /tmp/webapp /usr/webapp",
+      "sudo mv /tmp/webapp.tar /usr/",
       "ls -la /usr/webapp",
-      "mv /usr/webapp/users.csv /opt/",
     ]
   }
 }
