@@ -135,6 +135,8 @@ build {
       "echo \"tmp dir....\"",
       "ls -la /tmp/",
       "sudo tar -xvf /tmp/webapp.tar",
+      "echo \"tmp dir....\"",
+      "ls -la /tmp/",
       "sudo mv /tmp/webapp /usr/",
       "sudo mv /tmp/users.csv /opt/",
       "echo \"usr dir....\"",
