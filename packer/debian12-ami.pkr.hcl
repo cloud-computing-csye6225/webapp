@@ -132,9 +132,15 @@ build {
       "CHECKPOINT_DISABLE=1",
     ]
     inline = [
-      "sudo mv /tmp/webapp.tar /usr/",
+      "echo \"tmp dir....\"",
+      "ls -la /tmp/",
+      "sudo tar -xvf /tmp/webapp.tar",
+      "sudo mv /tmp/webapp /usr/",
+      "sudo mv /tmp/users.csv /opt/",
+      "echo \"usr dir....\"",
       "ls -la /usr/",
-      "tar -xvf /usr/webapp.tar",
+      "echo \"opt dir....\"",
+      "ls -la /opt/",
     ]
   }
 }
