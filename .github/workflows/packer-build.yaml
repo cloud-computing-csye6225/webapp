@@ -27,7 +27,6 @@ jobs:
         run: |
           mkdir builds
           go build -o ./builds/webapp ./cmd/main.go
-          mv ./webapp ./builds
           echo $APP_DEFAULTUSERS_CSV > ./builds/users.csv
           ls -la ./builds
 
