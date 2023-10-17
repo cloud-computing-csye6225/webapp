@@ -133,7 +133,7 @@ build {
     ]
     inline = [
       "sudo mv /tmp/webapp /usr/webapp",
-      "mv /usr/webapp/users.csv ${var.app_default_users}",
+      "mv /usr/webapp/users.csv /opt/",
     ]
   }
 }
