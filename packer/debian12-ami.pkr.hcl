@@ -122,7 +122,7 @@ build {
   }
 
   provisioner "file" {
-    source      = "./builds/main"
+    source      = "./builds/"
     destination = "/tmp/webapp"
   }
 
@@ -133,6 +133,7 @@ build {
     ]
     inline = [
       "sudo mv /tmp/webapp /usr/webapp",
+      "ls -la /usr/webapp",
       "mv /usr/webapp/users.csv /opt/",
     ]
   }
