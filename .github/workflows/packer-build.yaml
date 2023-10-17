@@ -21,12 +21,14 @@ jobs:
       - name: Check Go version
         run: go version
 
-      - name: Build application
+      - name: Build application and users.csv
+        env:
+          APP_DEFAULTUSERS_CSV: ${{ secrets.APP_DEFAULTUSERS_CSV }}
         run: |
           go build ./cmd/main.go
           mkdir builds
-          ls -la
           mv ./main ./builds
+          echo $APP_DEFAULTUSERS_CSV > ./builds/users.csv
           ls -la ./builds
 
       - name: Setup `packer`
