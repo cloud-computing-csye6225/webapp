@@ -26,7 +26,7 @@ jobs:
           APP_DEFAULTUSERS_CSV: ${{ secrets.APP_DEFAULTUSERS_CSV }}
         run: |
           mkdir builds
-          go build -o ../builds/webapp ./main.go
+          go build -o ./builds/webapp ./cmd/main.go
           mv ./webapp ./builds
           echo $APP_DEFAULTUSERS_CSV > ./builds/users.csv
           ls -la ./builds
