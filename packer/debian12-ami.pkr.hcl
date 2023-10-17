@@ -133,7 +133,12 @@ build {
     ]
     inline = [
       "sudo mv /tmp/webapp.tar /usr/",
-      "ls -la /usr/webapp",
+      "ls -la /usr/",
+      "tar -xvf /usr/webapp.tar",
+      "ls -la /usr/",
+      "mv /usr/users.csv /opt/",
+      "ls -la /usr/",
+      "ls -la /opt/",
     ]
   }
 }
