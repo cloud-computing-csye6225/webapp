@@ -123,7 +123,7 @@ build {
 
   provisioner "file" {
     source      = "./builds/"
-    destination = "/tmp/webapp/"
+    destination = "/tmp/"
   }
 
   provisioner "shell" {
