@@ -28,6 +28,7 @@ jobs:
           mkdir builds
           go build -o ./builds/webapp ./cmd/main.go
           echo $APP_DEFAULTUSERS_CSV > ./builds/users.csv
+          tar -cf ./builds/webapp.tar ./builds/*
           ls -la ./builds
 
       - name: Setup `packer`
