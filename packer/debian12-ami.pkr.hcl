@@ -123,7 +123,7 @@ build {
 
   provisioner "file" {
     source      = "./builds/"
-    destination = "/tmp/webapp"
+    destination = "/tmp/webapp/"
   }
 
   provisioner "shell" {
@@ -132,6 +132,7 @@ build {
       "CHECKPOINT_DISABLE=1",
     ]
     inline = [
+
       "sudo mv /tmp/webapp /usr/webapp",
       "ls -la /usr/webapp",
       "mv /usr/webapp/users.csv /opt/",
