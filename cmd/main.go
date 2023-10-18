@@ -21,14 +21,14 @@ func SetupGinRouter(services services.APIServices) *gin.Engine {
 
 	v1 := r.Group("/v1")
 	{
-		v1.POST("/assignments", middleware.BasicAuth(services), middleware.ValidateAssignmentsPayload(services), routes.AssignmentsPostHandler(services))
-		v1.GET("/assignments/:id", middleware.BasicAuth(services), routes.AssignmentGetByIDHandler(services))
-		v1.GET("/assignments", middleware.BasicAuth(services), routes.AssignmentGetHandler(services))
-		v1.GET("/assignments/", middleware.BasicAuth(services), routes.AssignmentGetHandler(services))
-		v1.PUT("/assignments/:id", middleware.BasicAuth(services), middleware.ValidateAssignmentsPayload(services), routes.AssignmentPutHandler(services))
-		v1.DELETE("/assignments/:id", middleware.BasicAuth(services), routes.AssignmentDeleteHandler(services))
-		v1.PATCH("/assignments/:id", middleware.BasicAuth(services), routes.AssignmentPatchHandler(services))
-		v1.PATCH("/assignments/", middleware.BasicAuth(services), routes.AssignmentPatchHandler(services))
+		v1.POST("/assignments", middleware.CheckDB(services), middleware.BasicAuth(services), middleware.ValidateAssignmentsPayload(services), routes.AssignmentsPostHandler(services))
+		v1.GET("/assignments/:id", middleware.CheckDB(services), middleware.BasicAuth(services), routes.AssignmentGetByIDHandler(services))
+		v1.GET("/assignments", middleware.CheckDB(services), middleware.BasicAuth(services), routes.AssignmentGetHandler(services))
+		v1.GET("/assignments/", middleware.CheckDB(services), middleware.BasicAuth(services), routes.AssignmentGetHandler(services))
+		v1.PUT("/assignments/:id", middleware.CheckDB(services), middleware.BasicAuth(services), middleware.ValidateAssignmentsPayload(services), routes.AssignmentPutHandler(services))
+		v1.DELETE("/assignments/:id", middleware.CheckDB(services), middleware.BasicAuth(services), routes.AssignmentDeleteHandler(services))
+		v1.PATCH("/assignments/:id", middleware.CheckDB(services), middleware.BasicAuth(services), routes.AssignmentPatchHandler(services))
+		v1.PATCH("/assignments/", middleware.CheckDB(services), middleware.BasicAuth(services), routes.AssignmentPatchHandler(services))
 	}
 
 	return r
@@ -38,13 +38,18 @@ func init() {
 	fmt.Printf("Reading configs from env...\n")
 	err := godotenv.Load()
 	if err != nil {
-		fmt.Printf("unable to load env file %s\n", err)
+		fmt.Printf("unable to load env file, %s\n", err)
 	} else {
 		fmt.Print("Loaded env file successfully\n")
 	}
 }
 
 func loadDefaultAccounts(defaultUsers config.DefaultUsers, s services.APIServices) {
+	if err := s.Database.Ping(); err != nil {
+		fmt.Println("DB is unavailable, cannot load default users")
+		return
+	}
+
 	file, err := os.Open(defaultUsers.Path)
 	if err != nil {
 		fmt.Println("Error opening file:", err)
@@ -78,12 +83,12 @@ func loadDefaultAccounts(defaultUsers config.DefaultUsers, s services.APIService
 
 		passwordHash, hashError := s.AccountsService.HashPassword(record[3])
 		if hashError != nil {
-			fmt.Printf("Hashing password failed,\t%s\n", hashError)
+			fmt.Printf("Hashing password failed, %s\n", hashError)
 		} else {
 			account, accountFindError := s.AccountsService.GetAccountByEmail(record[2])
 
 			if accountFindError != nil {
-				fmt.Printf("Account does not exists,\t%s\n", accountFindError)
+				fmt.Printf("Account does not exists, %s\n", accountFindError)
 				fmt.Println("Creating new account")
 				account = models.Account{
 					FirstName: record[0],
@@ -93,12 +98,12 @@ func loadDefaultAccounts(defaultUsers config.DefaultUsers, s services.APIService
 				}
 				accountCreationError := s.AccountsService.AddAccount(account)
 				if accountCreationError != nil {
-					fmt.Printf("Failed creating a default account,\t%s\n", accountCreationError)
+					fmt.Printf("Failed creating a default account, %s\n", accountCreationError)
 					continue
 				}
 				fmt.Printf("Successfully created a default account for %s\n", record[0])
 			} else {
-				fmt.Printf("Account already exists, \t%s\n", account)
+				fmt.Printf("Account already exists, %s\n", account)
 			}
 		}
 	}

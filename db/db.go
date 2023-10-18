@@ -34,7 +34,7 @@ func (p *PostgresDB) InitDatabase(cfg config.DatabaseConfig) error {
 
 	result := initDB.Exec(fmt.Sprintf("CREATE DATABASE %s", cfg.DBName))
 	if result.Error != nil {
-		fmt.Printf("Unable to create database\t%s\n", result.Error)
+		fmt.Printf("Unable to create database, %s\n", result.Error)
 	}
 
 	dsn = fmt.Sprintf(
@@ -53,7 +53,7 @@ func (p *PostgresDB) InitDatabase(cfg config.DatabaseConfig) error {
 		p.db = db
 		automigrateError := p.db.AutoMigrate(&models.Account{}, &models.Assignment{})
 		if automigrateError != nil {
-			fmt.Printf("Unable to automigrate schemas,\t%s\n", automigrateError)
+			fmt.Printf("Unable to automigrate schemas, %s\n", automigrateError)
 			return automigrateError
 		}
 	}
@@ -79,13 +79,13 @@ func (p *PostgresDB) Ping() error {
 	sqlDB, err := p.db.DB()
 
 	if err != nil {
-		fmt.Printf("error getting generic SQL from Gorm...\n %s", err)
+		fmt.Printf("error getting generic SQL from Gorm... %s\n", err)
 		return err
 	}
 
 	err = sqlDB.Ping()
 	if err != nil {
-		fmt.Printf("unable to ping database %s\n", err)
+		fmt.Printf("unable to ping database, %s\n", err)
 		return err
 	}
 
