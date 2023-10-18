@@ -7,7 +7,7 @@ on:
 
 jobs:
   packer-build:
-#    if: github.event.pull_request.merged == true
+    if: github.event.pull_request.merged == true
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -62,30 +62,30 @@ jobs:
           cd ..
           ls -la ./builds
 
-#      - name: Setup `packer`
-#        uses: hashicorp/setup-packer@main
-#        id: setup
-#        with:
-#          version: 'latest'
-#
-#      - name: Run `packer init`
-#        id: init
-#        run: "packer init ./packer/debian12-ami.pkr.hcl"
-#
-#      - name: Run `packer build`
-#        id: build
-#        env:
-#          AWS_ACCESS_KEY_ID: ${{ secrets.PKR_AWS_KEY_ID }}
-#          AWS_SECRET_ACCESS_KEY: ${{ secrets.PKR_AWS_SECRET_KEY }}
-#          PKR_AWS_REGION: ${{ vars.PKR_AWS_REGION }}
-#          PKR_AWS_SRC_AMI: ${{ vars.PKR_AWS_SRC_AMI }}
-#          PKR_AWS_SSH_USERNAME: ${{ vars.PKR_AWS_SSH_USERNAME }}
-#          PKR_AWS_SUBNET: ${{ vars.PKR_AWS_SUBNET }}
-#          APP_DBHOST: ${{ secrets.APP_DBHOST }}
-#          APP_DBUSER: ${{ secrets.APP_DBUSER }}
-#          APP_DBPASSWORD: ${{ secrets.APP_DBPASSWORD }}
-#          APP_DBNAME: ${{ secrets.APP_DBNAME }}
-#          APP_DBPORT: ${{ secrets.APP_DBPORT }}
-#          APP_SERVERPORT: ${{ secrets.APP_SERVERPORT }}
-#          APP_DEFAULT_USERS_LOC: ${{ secrets.APP_DEFAULT_USERS_LOC }}
-#        run: "packer build ./packer/debian12-ami.pkr.hcl"
+      - name: Setup `packer`
+        uses: hashicorp/setup-packer@main
+        id: setup
+        with:
+          version: 'latest'
+
+      - name: Run `packer init`
+        id: init
+        run: "packer init ./packer/debian12-ami.pkr.hcl"
+
+      - name: Run `packer build`
+        id: build
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.PKR_AWS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.PKR_AWS_SECRET_KEY }}
+          PKR_AWS_REGION: ${{ vars.PKR_AWS_REGION }}
+          PKR_AWS_SRC_AMI: ${{ vars.PKR_AWS_SRC_AMI }}
+          PKR_AWS_SSH_USERNAME: ${{ vars.PKR_AWS_SSH_USERNAME }}
+          PKR_AWS_SUBNET: ${{ vars.PKR_AWS_SUBNET }}
+          APP_DBHOST: ${{ secrets.APP_DBHOST }}
+          APP_DBUSER: ${{ secrets.APP_DBUSER }}
+          APP_DBPASSWORD: ${{ secrets.APP_DBPASSWORD }}
+          APP_DBNAME: ${{ secrets.APP_DBNAME }}
+          APP_DBPORT: ${{ secrets.APP_DBPORT }}
+          APP_SERVERPORT: ${{ secrets.APP_SERVERPORT }}
+          APP_DEFAULT_USERS_LOC: ${{ secrets.APP_DEFAULT_USERS_LOC }}
+        run: "packer build ./packer/debian12-ami.pkr.hcl"
