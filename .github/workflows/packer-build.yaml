@@ -1,5 +1,5 @@
 name: Packer build
-on: [pull_request]
+on: [push]
 
 jobs:
   packer-build:
