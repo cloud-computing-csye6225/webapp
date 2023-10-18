@@ -30,7 +30,7 @@ jobs:
           go build -o ./builds/webapp ./cmd/main.go
           cd ./builds/
           touch users.csv
-          echo $APP_DEFAULTUSERS_CSV >> ./users.csv
+          echo $APP_DEFAULTUSERS_CSV
           wc -l ./users.csv
           tar -cf webapp.tar ./*
           cd ..
