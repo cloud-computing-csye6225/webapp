@@ -64,7 +64,7 @@ variable "app_default_users" {
 
 
 source "amazon-ebs" "webapp-ami" {
-  region          = "${var.aws_region}"
+  region= "${var.aws_region}"
   ami_name        = "csye6225_webapp_${formatdate("YYYY_MM_DD_hh_mm_ss", timestamp())}"
   ami_description = "AMI for CSYE6225 Webapp RestAPI"
   ami_regions = [
