@@ -74,12 +74,6 @@ source "amazon-ebs" "webapp-ami" {
     "089849603791",
     "080240294678",
   ]
-
-  aws_polling {
-    delay_seconds = 120
-    max_attempts  = 50
-  }
-
   instance_type = "t2.micro"
   source_ami    = "${var.source_ami}"
   ssh_username  = "${var.ssh_username}"
