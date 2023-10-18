@@ -135,7 +135,6 @@ build {
       "sudo tar -xvf /tmp/webapp.tar",
       "sudo mv ./webapp /usr/",
       "sudo mv ./users.csv /opt/",
-      "sudo rm -r ./*"
     ]
   }
 }
