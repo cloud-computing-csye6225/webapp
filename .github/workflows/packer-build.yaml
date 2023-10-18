@@ -3,7 +3,7 @@ name: Packer build
 on:
   pull_request:
     types:
-      - opened
+      - closed
 
 jobs:
   packer-build:
