@@ -111,13 +111,13 @@ build {
       "sudo service postgresql restart",
       "sudo pg_isready",
       "echo \"Setting required env variables for the application\"",
-      "echo DBHOST=${var.app_dbhost} | sudo tee -a /etc/profile",
-      "echo DBUSER=${var.app_dbuser} | sudo tee -a /etc/profile",
-      "echo DBPASSWORD=${var.app_dbpassword} | sudo tee -a /etc/profile",
-      "echo DBNAME=${var.app_dbname} | sudo tee -a /etc/profile",
-      "echo DBPORT=${var.app_dbport} | sudo tee -a /etc/profile",
-      "echo SERVERPORT=${var.app_serverport} | sudo tee -a /etc/profile",
-      "echo DEFAULTUSERS=${var.app_default_users}| sudo tee -a /etc/profile",
+      "echo DBHOST=${var.app_dbhost} | sudo tee -a /etc/environment",
+      "echo DBUSER=${var.app_dbuser} | sudo tee -a /etc/environment",
+      "echo DBPASSWORD=${var.app_dbpassword} | sudo tee -a /etc/environment",
+      "echo DBNAME=${var.app_dbname} | sudo tee -a /etc/environment",
+      "echo DBPORT=${var.app_dbport} | sudo tee -a /etc/environment",
+      "echo SERVERPORT=${var.app_serverport} | sudo tee -a /etc/environment",
+      "echo DEFAULTUSERS=${var.app_default_users}| sudo tee -a /etc/environment",
     ]
   }
 
@@ -132,9 +132,9 @@ build {
       "CHECKPOINT_DISABLE=1",
     ]
     inline = [
-      "sudo tar -xvf /tmp/webapp.tar",
-      "sudo mv ./webapp /usr/",
-      "sudo mv ./users.csv /opt/",
+      "tar -xvf /tmp/webapp.tar",
+      "mv ./webapp /usr/",
+      "mv ./users.csv /opt/",
     ]
   }
 }
