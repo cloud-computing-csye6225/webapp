@@ -3,21 +3,20 @@ package services
 import (
 	"fmt"
 	"golang.org/x/crypto/bcrypt"
-	"gorm.io/gorm"
 	"webapp/db"
 	"webapp/models"
 )
 
 type AccountsService struct {
-	db *gorm.DB
+	db *db.PostgresDB
 }
 
 func NewAccountService(db *db.PostgresDB) *AccountsService {
-	return &AccountsService{db.GetConnection()}
+	return &AccountsService{db}
 }
 
 func (as AccountsService) AddAccount(account models.Account) error {
-	err := as.db.Create(&account).Error
+	err := as.db.GetConnection().Create(&account).Error
 	if err != nil {
 		fmt.Printf("Failed to create an Account, %s\n", err)
 		return err
@@ -28,7 +27,7 @@ func (as AccountsService) AddAccount(account models.Account) error {
 func (as AccountsService) GetAccountByEmail(email string) (models.Account, error) {
 	var account models.Account
 
-	if err := as.db.Where("email= ?", email).First(&account).Error; err != nil {
+	if err := as.db.GetConnection().Where("email= ?", email).First(&account).Error; err != nil {
 		fmt.Printf("Failed to get the Account, %s\n", err)
 		return account, err
 	}
@@ -38,7 +37,7 @@ func (as AccountsService) GetAccountByEmail(email string) (models.Account, error
 func (as AccountsService) GetAccountByID(accountID string) (models.Account, error) {
 	var account models.Account
 
-	if err := as.db.Where("id= ?", accountID).First(&account).Error; err != nil {
+	if err := as.db.GetConnection().Where("id= ?", accountID).First(&account).Error; err != nil {
 		fmt.Printf("Failed to get an Account, %s\n", err)
 		return account, err
 	}
@@ -48,7 +47,7 @@ func (as AccountsService) GetAccountByID(accountID string) (models.Account, erro
 func (as AccountsService) GetAccounts() ([]models.Account, error) {
 	var accounts []models.Account
 
-	if err := as.db.Find(&accounts).Error; err != nil {
+	if err := as.db.GetConnection().Find(&accounts).Error; err != nil {
 		fmt.Printf("Failed to get an Accounts, %s\n", err)
 		return accounts, err
 	}

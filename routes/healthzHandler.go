@@ -15,7 +15,7 @@ func HealthzGetReqHandler(db db.Database) gin.HandlerFunc {
 			querystring := context.Request.URL.RawQuery
 			all, err := io.ReadAll(context.Request.Body)
 			if err != nil {
-				fmt.Printf("Error while reading the body %s\n", err)
+				fmt.Printf("Error while reading the body, %s\n", err)
 			}
 			if querystring != "" || len(all) > 0 {
 				context.String(http.StatusBadRequest, "")

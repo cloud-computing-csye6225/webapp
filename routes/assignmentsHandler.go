@@ -54,7 +54,6 @@ func AssignmentGetHandler(services services.APIServices) gin.HandlerFunc {
 			c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": err})
 			return
 		} else {
-			fmt.Printf("In get handler, %v", all)
 			if len(all) > 0 {
 				c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": "body is not allowed for GET request"})
 				return
