@@ -28,12 +28,12 @@ jobs:
           sudo service postgresql start
           pg_isready
 
-#      - name: Updating database user
-#        env:
-#          DBUSER: ${{ secrets.APP_DBUSER }}
-#          DBPASSWORD: ${{ secrets.APP_DBPASSWORD }}
-#        run: |
-#          sudo -u postgres psql -c "ALTER ROLE $DBUSER WITH PASSWORD '$DBPASSWORD';"
+      - name: Updating database user
+        env:
+          DBUSER: ${{ secrets.APP_DBUSER }}
+          DBPASSWORD: ${{ secrets.APP_DBPASSWORD }}
+        run: |
+          sudo -u postgres psql -c "ALTER ROLE $DBUSER WITH PASSWORD '$DBPASSWORD';"
 
       - name: run integration test
         env:
