@@ -11,6 +11,7 @@ jobs:
       - name: Setup build location
         run: |
           mkdir builds
+          touch ./builds/webapp.tar
           ls -la ./builds
 
       - name: Setup `packer`
