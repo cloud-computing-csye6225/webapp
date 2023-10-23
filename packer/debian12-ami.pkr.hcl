@@ -83,7 +83,7 @@ build {
   }
 
   provisioner "shell" {
-    environment_vars=[
+    environment_vars = [
       "AWS_REGION=${var.aws_region}",
       "SOURCE_AMI=${var.source_ami}",
       "SSH_USERNAME=${var.ssh_username}",
@@ -95,6 +95,6 @@ build {
       "APP_SERVERPORT=${var.app_serverport}",
       "APP_DEFAULT_USERS_LOC=${var.app_default_users}"
     ]
-    script = "./scripts/ami-setup.sh"
+    script = "./packer/scripts/ami-setup.sh"
   }
 }
