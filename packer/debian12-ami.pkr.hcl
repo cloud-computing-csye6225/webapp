@@ -74,16 +74,16 @@ source "amazon-ebs" "webapp-ami" {
     "089849603791",
     "080240294678",
   ]
-  instance_type = "t2.micro"
-  source_ami    = "${var.source_ami}"
-  ssh_username  = "${var.ssh_username}"
-  subnet_id     = "${var.subnet_id}"
+  instance_type= "t2.micro"
+  source_ami= "${var.source_ami}"
+  ssh_username= "${var.ssh_username}"
+  subnet_id= "${var.subnet_id}"
 }
 
 build {
   sources = ["source.amazon-ebs.webapp-ami"]
 
-  provisioner "shell"
+  provisioner "shell" {
     environment_vars = [
       "DEBIAN_FRONTEND=noninteractive",
       "CHECKPOINT_DISABLE=1",
