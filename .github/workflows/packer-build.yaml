@@ -3,11 +3,11 @@ name: Packer build
 on:
   pull_request:
     types:
-      - closed
+      - opened
 
 jobs:
   packer-build:
-    if: github.event.pull_request.merged == true
+#    if: github.event.pull_request.merged == true
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
