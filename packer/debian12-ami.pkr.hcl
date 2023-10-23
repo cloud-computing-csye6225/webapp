@@ -83,7 +83,7 @@ source "amazon-ebs" "webapp-ami" {
 build {
   sources = ["source.amazon-ebs.webapp-ami"]
 
-  provisioner "shell" {
+  provisioner "shell"
     environment_vars = [
       "DEBIAN_FRONTEND=noninteractive",
       "CHECKPOINT_DISABLE=1",
