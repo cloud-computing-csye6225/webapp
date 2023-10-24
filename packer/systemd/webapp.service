@@ -1,6 +1,6 @@
 [Unit]
 Description=Webapp service
-After=network.target
+After=cloud-final.service
 
 [Service]
 Type=simple
@@ -16,4 +16,4 @@ StandardError=webapp
 SyslogIdentifier=webappservice
 
 [Install]
-WantedBy=multi-user.target
+WantedBy=cloud-init.target
