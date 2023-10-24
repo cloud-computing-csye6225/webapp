@@ -45,7 +45,6 @@ echo "DEFAULTUSERS=$APP_DEFAULT_USERS_LOC" | sudo tee -a /etc/environment
 
 # Set up systemd for webapp
 sudo systemctl daemon-reload
-sudo systemctl start webapp.service
-sudo systemctl status webapp.service
+sudo systemctl enable webapp
 
 
