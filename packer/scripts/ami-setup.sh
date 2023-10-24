@@ -13,6 +13,14 @@ sudo apt-get clean -y
 sudo tar -xvf /tmp/webapp.tar
 sudo mv ./webapp /usr/
 sudo mv ./users.csv /opt/
+sudo mv ./webapp.service /etc/systemd/system/
+
+# Create application user and set permissions
+sudo groupadd csye6225
+sudo useradd -m -g csye6225 webapp
+sudo chmod -R 750 /usr/webapp
+sudo chmod -R 740 /opt/users.csv
+
 
 # Install and start Postgresql
 echo 'Postgres setup'
@@ -34,4 +42,10 @@ echo "DBNAME=$APP_DBNAME" | sudo tee -a /etc/environment
 echo "DBPORT=$APP_DBPORT" | sudo tee -a /etc/environment
 echo "SERVERPORT=$APP_SERVERPORT" | sudo tee -a /etc/environment
 echo "DEFAULTUSERS=$APP_DEFAULT_USERS_LOC" | sudo tee -a /etc/environment
+
+# Set up systemd for webapp
+sudo systemctl daemon-reload
+sudo systemctl start webapp.service
+sudo systemctl status webapp.service
+
 
