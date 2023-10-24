@@ -53,6 +53,8 @@ jobs:
       - name: Build application and users.csv
         run: |
           mkdir builds
+          mv ./packer/systemd/webapp.service ./builds/
+          ls -la ./builds
           go build -o ./builds/webapp ./cmd/main.go
           cd ./builds/
           touch users.csv
