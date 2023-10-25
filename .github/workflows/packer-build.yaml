@@ -52,12 +52,12 @@ jobs:
 
       - name: Create systemd unit file
         env:
-          USER: ${{ var.SYSTEMCTL_USER }}
-          GROUP: ${{ var.SYSTEMCTL_GROUP }}
-          ENVFILE: ${{ var.SYSTEMCTL_ENVFILE_LOC }}
-          EXECFILE: ${{ var.SYSTEMCTL_EXECFILE }}
-          APPLOG: ${{ var.SYSTEMCTL_APPLOG }}
-          ERRLOG: ${{ var.SYSTEMCTL_ERRLOG }}
+          USER: ${{ vars.SYSTEMCTL_USER }}
+          GROUP: ${{ vars.SYSTEMCTL_GROUP }}
+          ENVFILE: ${{ vars.SYSTEMCTL_ENVFILE_LOC }}
+          EXECFILE: ${{ vars.SYSTEMCTL_EXECFILE }}
+          APPLOG: ${{ vars.SYSTEMCTL_APPLOG }}
+          ERRLOG: ${{ vars.SYSTEMCTL_ERRLOG }}
         run: |
           cat ./packer/systemd/webapp.service \
           | sed 's|{{USER}}|$USER|' \
