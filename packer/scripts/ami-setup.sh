@@ -26,12 +26,10 @@ sudo mv ./users.csv /opt/webapp/data/
 sudo mv ./webapp.service /etc/systemd/system/
 
 # Set permissions
-sudo chmod -R 750 /opt/webapp/bin/webapp
-sudo chmod -R 740 /opt/webapp/data/users.csv
-
-# Install and start Postgresql
-echo 'Postgres setup'
-sudo apt-get install postgresql -y
+sudo chown webapp:csye6225 /opt/webapp/bin/webapp
+sudo chmod 710 /opt/webapp/bin/webapp
+sudo chown webapp:csye6225 /opt/webapp/data/users.csv
+sudo chmod 740 /opt/webapp/data/users.csv
 
 # Set up systemd for webapp
 sudo systemctl daemon-reload
