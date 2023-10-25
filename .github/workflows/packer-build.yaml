@@ -50,6 +50,24 @@ jobs:
           DBPORT: ${{ secrets.APP_DBPORT }}
         run: go test ./integration_tests/
 
+      - name: Create systemd unit file
+        env:
+          USER: ${{ var.SYSTEMCTL_USER }}
+          GROUP: ${{ var.SYSTEMCTL_GROUP }}
+          ENVFILE: ${{ var.SYSTEMCTL_ENVFILE_LOC }}
+          EXECFILE: ${{ var.SYSTEMCTL_EXECFILE }}
+          APPLOG: ${{ var.SYSTEMCTL_APPLOG }}
+          ERRLOG: ${{ var.SYSTEMCTL_ERRLOG }}
+        run: |
+          cat ./packer/systemd/webapp.service \
+          | sed 's|{{USER}}|$USER|' \
+          | sed 's|{{GROUP}}|$GROUP|' \
+          | sed 's|{{ENVFILE}}|$ENVFILE|' \
+          | sed 's|{{EXECFILE}}|$EXECFILE|' \
+          | sed 's|{{APPLOG}}|$APPLOG|' \
+          | sed 's|{{ERRLOG}}|$ERRLOG|' \
+          > ./packer/systemd/webapp.service
+
       - name: Build application and users.csv
         run: |
           mkdir builds
