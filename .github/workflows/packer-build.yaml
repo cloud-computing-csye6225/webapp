@@ -60,12 +60,12 @@ jobs:
           ERRLOG: ${{ vars.SYSTEMCTL_ERRLOG }}
         run: |
           cat ./packer/systemd/webapp.service \
-          | sed 's|{{USER}}|$USER|' \
-          | sed 's|{{GROUP}}|$GROUP|' \
-          | sed 's|{{ENVFILE}}|$ENVFILE|' \
-          | sed 's|{{EXECFILE}}|$EXECFILE|' \
-          | sed 's|{{APPLOG}}|$APPLOG|' \
-          | sed 's|{{ERRLOG}}|$ERRLOG|' \
+          | sed "s|{{USER}}|$USER|" \
+          | sed "s|{{GROUP}}|$GROUP|" \
+          | sed "s|{{ENVFILE}}|$ENVFILE|" \
+          | sed "s|{{EXECFILE}}|$EXECFILE|" \
+          | sed "s|{{APPLOG}}|$APPLOG|" \
+          | sed "s|{{ERRLOG}}|$ERRLOG|" \
           > ./packer/systemd/webapp.service
 
       - name: Build application and users.csv
