@@ -9,17 +9,25 @@ sudo apt-get update -y
 sudo apt-get upgrade -y
 sudo apt-get clean -y
 
+# Create application user
+sudo groupadd csye6225
+sudo useradd -s /bin/false -g csye6225 -d /opt/webapp -m webapp
+
+# Create folder structure
+sudo -u webapp mkdir /opt/webapp/bin
+sudo -u webapp mkdir /opt/webapp/conf
+sudo -u webapp mkdir /opt/webapp/data
+sudo -u webapp mkdir /opt/webapp/logs
+
 # Extract and move files
 sudo tar -xvf /tmp/webapp.tar
-sudo mv ./webapp /usr/
-sudo mv ./users.csv /opt/
+sudo mv ./webapp /opt/webapp/bin/
+sudo mv ./users.csv /opt/webapp/data/
 sudo mv ./webapp.service /etc/systemd/system/
 
-# Create application user and set permissions
-sudo groupadd csye6225
-sudo useradd -m -g csye6225 webapp
-sudo chmod -R 750 /usr/webapp
-sudo chmod -R 740 /opt/users.csv
+# Set permissions
+sudo chmod -R 750 /opt/webapp/bin/webapp
+sudo chmod -R 740 /opt/webapp/data/users.csv
 
 # Install and start Postgresql
 echo 'Postgres setup'
