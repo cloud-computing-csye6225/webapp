@@ -2,10 +2,12 @@ package db
 
 import (
 	"fmt"
+	"go.uber.org/zap"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
-	"gorm.io/gorm/logger"
+	gormLogger "gorm.io/gorm/logger"
 	"webapp/config"
+	"webapp/logger"
 	"webapp/models"
 )
 
@@ -29,12 +31,13 @@ func (p *PostgresDB) InitDatabase(cfg config.DatabaseConfig) error {
 		cfg.DBPort,
 	)
 	initDB, err := gorm.Open(postgres.Open(dsn), &gorm.Config{
-		Logger: logger.Default.LogMode(logger.Silent),
+		Logger: gormLogger.Default.LogMode(gormLogger.Silent),
 	})
 
+	logger.Info("Creating DB if not exists")
 	result := initDB.Exec(fmt.Sprintf("CREATE DATABASE %s", cfg.DBName))
 	if result.Error != nil {
-		fmt.Printf("Unable to create database, %s\n", result.Error)
+		logger.Error("Unable to create database", zap.Error(result.Error))
 	}
 
 	dsn = fmt.Sprintf(
@@ -47,13 +50,13 @@ func (p *PostgresDB) InitDatabase(cfg config.DatabaseConfig) error {
 	)
 
 	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{
-		Logger: logger.Default.LogMode(logger.Silent),
+		Logger: gormLogger.Default.LogMode(gormLogger.Silent),
 	})
 	if err == nil {
 		p.db = db
 		automigrateError := p.db.AutoMigrate(&models.Account{}, &models.Assignment{})
 		if automigrateError != nil {
-			fmt.Printf("Unable to automigrate schemas, %s\n", automigrateError)
+			logger.Error("Unable to automigrate schemas", zap.Error(automigrateError))
 			return automigrateError
 		}
 	}
@@ -66,26 +69,26 @@ func (p *PostgresDB) GetConnection() *gorm.DB {
 
 func (p *PostgresDB) Ping() error {
 	if p.db == nil {
-		fmt.Printf("Database connection is not active, trying to reconnect to DB....\n")
+		logger.Info("Database connection is not active, trying to reconnect to DB...")
 		configs := config.GetConfigs()
 		err := p.InitDatabase(configs.DBConfig)
 		if err != nil {
-			fmt.Printf("unable to ping database, database connection is not established\n%s\n", err)
+			logger.Error("unable to ping database, database connection is not established", zap.Error(err))
 			return err
 		}
-		fmt.Printf("Database connection established successfully\n")
+		logger.Info("Database connection established successfully")
 	}
 
 	sqlDB, err := p.db.DB()
 
 	if err != nil {
-		fmt.Printf("error getting generic SQL from Gorm... %s\n", err)
+		logger.Error("error getting generic SQL from Gorm...", zap.Error(err))
 		return err
 	}
 
 	err = sqlDB.Ping()
 	if err != nil {
-		fmt.Printf("unable to ping database, %s\n", err)
+		logger.Error("unable to ping database", zap.Error(err))
 		return err
 	}
 

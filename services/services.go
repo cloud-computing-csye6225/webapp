@@ -1,9 +1,10 @@
 package services
 
 import (
-	"fmt"
+	"go.uber.org/zap"
 	"webapp/config"
 	"webapp/db"
+	"webapp/logger"
 )
 
 type Services interface {
@@ -17,10 +18,11 @@ type APIServices struct {
 }
 
 func (s *APIServices) LoadServices(configs config.Config) {
+	logger.Info("Initializing DB...")
 	d := &db.PostgresDB{}
 	err := d.InitDatabase(configs.DBConfig)
 	if err != nil {
-		fmt.Printf("failed to initialize database: %s", err)
+		logger.Error("failed to initialize database", zap.Error(err))
 	}
 	s.Database = d
 	s.AccountsService = NewAccountService(d)

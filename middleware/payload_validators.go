@@ -5,8 +5,10 @@ import (
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/xeipuuv/gojsonschema"
+	"go.uber.org/zap"
 	"io"
 	"net/http"
+	"webapp/logger"
 	"webapp/services"
 )
 
@@ -60,17 +62,16 @@ func ValidateAssignmentsPayload(services services.APIServices) gin.HandlerFunc {
 
 		result, err := gojsonschema.Validate(schemaLoader, payloadLoader)
 		if err != nil {
-			fmt.Printf("Failed validating the schema, %v\n", err)
+			logger.Error("Failed validating the schema", zap.Error(err))
 			c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			return
 		}
 
 		if result.Valid() {
-			fmt.Printf("The incoming payload is VALID...\n")
+			logger.Info("The incoming payload is VALID")
 			c.Next()
 			return
 		} else {
-			fmt.Printf("The incoming payload is INVALID...\n")
 			errors := result.Errors()
 			var errorSlice []string
 
@@ -78,6 +79,7 @@ func ValidateAssignmentsPayload(services services.APIServices) gin.HandlerFunc {
 				errorSlice = append(errorSlice, fmt.Sprintf("%v, %v", errors[i].Field(), errors[i].Description()))
 				fmt.Printf("validation error: %v - %v\n", errors[i].Field(), errors[i].Description())
 			}
+			logger.Warn("The incoming payload is INVALID", zap.Any("Validation errors", errorSlice))
 			c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"errors": errorSlice})
 			return
 		}

@@ -1,8 +1,10 @@
 package config
 
 import (
+	"go.uber.org/zap"
 	"os"
 	"strconv"
+	"webapp/logger"
 )
 
 type DatabaseConfig struct {
@@ -14,7 +16,8 @@ type DatabaseConfig struct {
 }
 
 type ServerConfig struct {
-	Host string
+	Host    string
+	GinMode string
 }
 
 type DefaultUsers struct {
@@ -28,6 +31,7 @@ type Config struct {
 }
 
 func GetConfigs() Config {
+	logger.Info("Getting configs from environment")
 	return Config{
 		DBConfig: DatabaseConfig{
 			DBUser:     getEnvVariable("DBUSER", ""),
@@ -37,7 +41,8 @@ func GetConfigs() Config {
 			DBPort:     getEnvVariableAsInt("DBPORT", 5000),
 		},
 		ServerConfig: ServerConfig{
-			Host: getEnvVariable("SERVERPORT", ":8080"),
+			Host:    getEnvVariable("SERVERPORT", ":8080"),
+			GinMode: getEnvVariable("GIN_MODE", "debug"),
 		},
 		DefaultUsers: DefaultUsers{
 			Path: getEnvVariable("DEFAULTUSERS", ""),
@@ -46,6 +51,7 @@ func GetConfigs() Config {
 }
 
 func getEnvVariable(key, defaultValue string) string {
+	logger.Info("Getting env", zap.Any("key", key))
 	if ev, evExists := os.LookupEnv(key); evExists {
 		return ev
 	}
@@ -53,6 +59,7 @@ func getEnvVariable(key, defaultValue string) string {
 }
 
 func getEnvVariableAsInt(key string, defaultValue int) int {
+	logger.Info("Getting env", zap.Any("key", key))
 	if ev, evExists := os.LookupEnv(key); evExists {
 		var atoi, err = strconv.Atoi(ev)
 		if err == nil {
