@@ -1,12 +1,13 @@
 package routes
 
 import (
-	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
+	"go.uber.org/zap"
 	"io"
 	"net/http"
 	"time"
+	"webapp/logger"
 	"webapp/models"
 	"webapp/services"
 )
@@ -16,12 +17,14 @@ func AssignmentsPostHandler(services services.APIServices) gin.HandlerFunc {
 		var assignment models.Assignment
 
 		if err := c.Bind(&assignment); err != nil {
+			logger.Error("Failed to bind incoming payload with Gin", zap.Error(err))
 			c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			return
 		}
 
 		//Check if deadline is in future
 		if !isFutureTime(assignment.Deadline) {
+			logger.Warn("Assignment deadline is in past")
 			c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": "Assignment deadline cannot be in past"})
 			return
 		}
@@ -39,9 +42,11 @@ func AssignmentsPostHandler(services services.APIServices) gin.HandlerFunc {
 			assignment.AccountID = account.ID
 			err := services.AssignmentService.AddAssignment(&assignment)
 			if err != nil {
+				logger.Error("Failed to create an assignment", zap.Error(err))
 				c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": err})
 				return
 			}
+			logger.Info("Assignment created successfully")
 			c.JSON(http.StatusCreated, assignment)
 		}
 	}
@@ -51,10 +56,12 @@ func AssignmentGetHandler(services services.APIServices) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		all, err := io.ReadAll(c.Request.Body)
 		if err != nil {
+			logger.Error("Error while reading the body", zap.Error(err))
 			c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": err})
 			return
 		} else {
 			if len(all) > 0 {
+				logger.Warn("Body is not allowed")
 				c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": "body is not allowed for GET request"})
 				return
 			}
@@ -62,23 +69,26 @@ func AssignmentGetHandler(services services.APIServices) gin.HandlerFunc {
 
 		assignments, err := services.AssignmentService.GetAssignment()
 		if err != nil {
+			logger.Error("Failed to get the assignments", zap.Error(err))
 			c.AbortWithStatusJSON(http.StatusServiceUnavailable, gin.H{"error": err.Error()})
 			return
 		}
+		logger.Info("Successfully got the assignments")
 		c.JSON(http.StatusOK, assignments)
 	}
 }
 
 func AssignmentGetByIDHandler(services services.APIServices) gin.HandlerFunc {
 	return func(c *gin.Context) {
-
 		// Check for body
 		all, err := io.ReadAll(c.Request.Body)
 		if err != nil {
+			logger.Error("Error while reading the body", zap.Error(err))
 			c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": err})
 			return
 		} else {
 			if len(all) > 0 {
+				logger.Warn("Body is not allowed")
 				c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": "body is not allowed for GET request"})
 				return
 			}
@@ -89,6 +99,7 @@ func AssignmentGetByIDHandler(services services.APIServices) gin.HandlerFunc {
 
 		// Get is UUID is invalid and sent bac request
 		if !IsValidUUID(assignmentID) {
+			logger.Warn("Assignment UUID is invalid", zap.Any("assignmentID", assignmentID))
 			c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": "Invalid UUID"})
 			return
 		}
@@ -96,9 +107,11 @@ func AssignmentGetByIDHandler(services services.APIServices) gin.HandlerFunc {
 		// Get assignment
 		assignment, err := services.AssignmentService.GetAssignmentByID(assignmentID)
 		if err != nil {
+			logger.Error("Failed to get the assignment", zap.Error(err))
 			c.AbortWithStatusJSON(http.StatusNotFound, gin.H{"error": "Assignment not found"})
 			return
 		}
+		logger.Info("Successfully got the assignments")
 		c.JSON(http.StatusOK, assignment)
 	}
 }
@@ -110,6 +123,7 @@ func AssignmentPutHandler(services services.APIServices) gin.HandlerFunc {
 
 		// Get is UUID is invalid and sent bac request
 		if !IsValidUUID(assignmentID) {
+			logger.Warn("Assignment UUID is invalid", zap.Any("assignmentID", assignmentID))
 			c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": "Invalid UUID"})
 			return
 		}
@@ -117,14 +131,14 @@ func AssignmentPutHandler(services services.APIServices) gin.HandlerFunc {
 		//Get assignment from DB
 		assignment, err := services.AssignmentService.GetAssignmentByID(assignmentID)
 		if err != nil {
-			fmt.Printf("Error getting the assignment with id %v, %v\n", assignmentID, err)
+			logger.Error("Failed to get the assignment", zap.Error(err))
 			c.AbortWithStatusJSON(http.StatusNotFound, gin.H{"error": "Assignment not found"})
 			return
 		}
 
 		// Bind new data to the retrieved assignment
 		if err := c.ShouldBindJSON(&assignment); err != nil {
-			fmt.Printf("Error binding the assignment, %v\n", err)
+			logger.Error("Failed to bind incoming payload with Gin", zap.Error(err))
 			c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			return
 		}
@@ -133,6 +147,7 @@ func AssignmentPutHandler(services services.APIServices) gin.HandlerFunc {
 		account, exists := c.Value("loggedInAccount").(models.Account)
 		if exists {
 			if account.ID != assignment.AccountID {
+				logger.Warn("Unauthorized access to the assignment")
 				c.AbortWithStatusJSON(http.StatusForbidden, gin.H{"error": "unauthorized access"})
 				return
 			}
@@ -140,17 +155,18 @@ func AssignmentPutHandler(services services.APIServices) gin.HandlerFunc {
 
 		//Check if deadline is in future
 		if !isFutureTime(assignment.Deadline) {
+			logger.Warn("Assignment deadline is in past")
 			c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": "Assignment deadline cannot be in past"})
 			return
 		}
 
 		updatedAssignment, err := services.AssignmentService.UpdateAssignment(assignment)
 		if err != nil {
-			fmt.Printf("Error updating the assignment with id %v, %v\n", assignmentID, err)
+			logger.Error("Failed to update an assignment", zap.Error(err))
 			c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 			return
 		}
-
+		logger.Info("Assignment updated successfully")
 		c.JSON(http.StatusOK, updatedAssignment)
 	}
 }
@@ -160,10 +176,12 @@ func AssignmentDeleteHandler(services services.APIServices) gin.HandlerFunc {
 		// Check if body is empty
 		all, err := io.ReadAll(c.Request.Body)
 		if err != nil {
+			logger.Error("Error while reading the body", zap.Error(err))
 			c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": err})
 			return
 		} else {
 			if len(all) > 0 {
+				logger.Warn("Body is not allowed")
 				c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": "body is not allowed for DELETE request"})
 				return
 			}
@@ -174,6 +192,7 @@ func AssignmentDeleteHandler(services services.APIServices) gin.HandlerFunc {
 
 		// Get is UUID is invalid and sent bac request
 		if !IsValidUUID(assignmentID) {
+			logger.Warn("Assignment UUID is invalid", zap.Any("assignmentID", assignmentID))
 			c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": "Invalid UUID"})
 			return
 		}
@@ -181,6 +200,7 @@ func AssignmentDeleteHandler(services services.APIServices) gin.HandlerFunc {
 		// Get assignment from DB
 		assignment, err := services.AssignmentService.GetAssignmentByID(assignmentID)
 		if err != nil {
+			logger.Error("Failed to get the assignment", zap.Error(err))
 			c.AbortWithStatusJSON(http.StatusNotFound, gin.H{"error": "Assignment not found"})
 			return
 		}
@@ -189,8 +209,7 @@ func AssignmentDeleteHandler(services services.APIServices) gin.HandlerFunc {
 		account, exists := c.Value("loggedInAccount").(models.Account)
 		if exists {
 			if account.ID != assignment.AccountID {
-				fmt.Printf("%v, %v\n", account.ID, assignment.AccountID)
-				fmt.Printf("Authorization failed, User %v cannot update the assignment", account.FirstName)
+				logger.Warn("Unauthorized access to the assignment")
 				c.AbortWithStatusJSON(http.StatusForbidden, gin.H{"error": "unauthorized access"})
 				return
 			}
@@ -198,10 +217,12 @@ func AssignmentDeleteHandler(services services.APIServices) gin.HandlerFunc {
 
 		err = services.AssignmentService.DeleteAssignment(assignment)
 		if err != nil {
+			logger.Error("Failed to delete the assignment", zap.Error(err))
 			c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 			return
 		}
 
+		logger.Info("Successfully deleted the assignment")
 		c.Status(http.StatusNoContent)
 		return
 	}
@@ -209,6 +230,7 @@ func AssignmentDeleteHandler(services services.APIServices) gin.HandlerFunc {
 
 func AssignmentPatchHandler(services services.APIServices) gin.HandlerFunc {
 	return func(c *gin.Context) {
+		logger.Warn("Method not allowed")
 		c.JSON(http.StatusMethodNotAllowed, gin.H{"error": "Method not allowed"})
 	}
 }

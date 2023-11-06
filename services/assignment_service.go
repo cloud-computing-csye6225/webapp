@@ -1,8 +1,9 @@
 package services
 
 import (
-	"fmt"
+	"go.uber.org/zap"
 	"webapp/db"
+	"webapp/logger"
 	"webapp/models"
 )
 
@@ -17,7 +18,7 @@ func NewAssignmentService(db *db.PostgresDB) *AssignmentService {
 func (as AssignmentService) AddAssignment(assignment *models.Assignment) error {
 	err := as.db.GetConnection().Create(&assignment).Error
 	if err != nil {
-		fmt.Printf("Failed to create an Assignment, %s\n", err)
+		logger.Error("failed to create an Assignment", zap.Error(err))
 		return err
 	}
 	return nil
@@ -27,7 +28,7 @@ func (as AssignmentService) GetAssignment() ([]models.Assignment, error) {
 	var assignments []models.Assignment
 
 	if err := as.db.GetConnection().Find(&assignments).Error; err != nil {
-		fmt.Printf("Failed to get an Accounts, %s\n", err)
+		logger.Error("failed to get the Assignment", zap.Error(err))
 		return assignments, err
 	}
 	return assignments, nil
@@ -37,7 +38,7 @@ func (as AssignmentService) GetAssignmentByID(assignmentID string) (models.Assig
 	var assignment models.Assignment
 
 	if err := as.db.GetConnection().Where("id= ?", assignmentID).First(&assignment).Error; err != nil {
-		fmt.Printf("Failed to get an Assignment, %s\n", err)
+		logger.Error("failed to get the Assignment", zap.Error(err))
 		return assignment, err
 	}
 	return assignment, nil
@@ -45,7 +46,7 @@ func (as AssignmentService) GetAssignmentByID(assignmentID string) (models.Assig
 
 func (as AssignmentService) DeleteAssignment(assignment models.Assignment) error {
 	if err := as.db.GetConnection().Delete(&assignment).Error; err != nil {
-		fmt.Printf("Failed to delete the assignment, %s\n", err)
+		logger.Error("failed to delete the Assignment", zap.Error(err))
 		return err
 	}
 	return nil
@@ -54,7 +55,7 @@ func (as AssignmentService) DeleteAssignment(assignment models.Assignment) error
 func (as AssignmentService) UpdateAssignment(assignment models.Assignment) (models.Assignment, error) {
 	oldAssignment, err := as.GetAssignmentByID(assignment.ID)
 	if err != nil {
-		fmt.Printf("Failed to get assignment with ID %s to delete, %s\n", assignment.ID, err)
+		logger.Error("failed to get the Assignment", zap.Error(err))
 		return oldAssignment, err
 	} else {
 		updateError := as.db.GetConnection().Model(&oldAssignment).Updates(models.Assignment{
@@ -66,7 +67,7 @@ func (as AssignmentService) UpdateAssignment(assignment models.Assignment) (mode
 		}).Error
 
 		if updateError != nil {
-			fmt.Printf("Failed to update the assignment, %s\n", err)
+			logger.Error("failed to update the Assignment", zap.Error(err))
 			return oldAssignment, updateError
 		}
 	}

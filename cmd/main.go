@@ -2,12 +2,13 @@ package main
 
 import (
 	"encoding/csv"
-	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
+	"go.uber.org/zap"
 	"io"
 	"os"
 	"webapp/config"
+	"webapp/logger"
 	"webapp/middleware"
 	"webapp/models"
 	"webapp/routes"
@@ -15,51 +16,55 @@ import (
 )
 
 func SetupGinRouter(services services.APIServices) *gin.Engine {
+	gin.SetMode(gin.ReleaseMode)
 	r := gin.Default()
 	r.NoRoute(routes.NoRouteHandler)
+	r.Use(middleware.LogWebRequests())
 	r.Any("/healthz", routes.HealthzGetReqHandler(services.Database))
 
 	v1 := r.Group("/v1")
 	{
 		v1.POST("/assignments", middleware.CheckDB(services), middleware.BasicAuth(services), middleware.ValidateAssignmentsPayload(services), routes.AssignmentsPostHandler(services))
 		v1.GET("/assignments/:id", middleware.CheckDB(services), middleware.BasicAuth(services), routes.AssignmentGetByIDHandler(services))
-		v1.GET("/assignments", middleware.CheckDB(services), middleware.BasicAuth(services), routes.AssignmentGetHandler(services))
-		v1.GET("/assignments/", middleware.CheckDB(services), middleware.BasicAuth(services), routes.AssignmentGetHandler(services))
-		v1.PUT("/assignments/:id", middleware.CheckDB(services), middleware.BasicAuth(services), middleware.ValidateAssignmentsPayload(services), routes.AssignmentPutHandler(services))
-		v1.DELETE("/assignments/:id", middleware.CheckDB(services), middleware.BasicAuth(services), routes.AssignmentDeleteHandler(services))
-		v1.PATCH("/assignments/:id", middleware.CheckDB(services), middleware.BasicAuth(services), routes.AssignmentPatchHandler(services))
-		v1.PATCH("/assignments/", middleware.CheckDB(services), middleware.BasicAuth(services), routes.AssignmentPatchHandler(services))
+		v1.GET("/assignments", middleware.LogWebRequests(), middleware.CheckDB(services), middleware.BasicAuth(services), routes.AssignmentGetHandler(services))
+		v1.GET("/assignments/", middleware.LogWebRequests(), middleware.CheckDB(services), middleware.BasicAuth(services), routes.AssignmentGetHandler(services))
+		v1.PUT("/assignments/:id", middleware.LogWebRequests(), middleware.CheckDB(services), middleware.BasicAuth(services), middleware.ValidateAssignmentsPayload(services), routes.AssignmentPutHandler(services))
+		v1.DELETE("/assignments/:id", middleware.LogWebRequests(), middleware.CheckDB(services), middleware.BasicAuth(services), routes.AssignmentDeleteHandler(services))
+		v1.PATCH("/assignments/:id", middleware.LogWebRequests(), middleware.CheckDB(services), middleware.BasicAuth(services), routes.AssignmentPatchHandler(services))
+		v1.PATCH("/assignments/", middleware.LogWebRequests(), middleware.CheckDB(services), middleware.BasicAuth(services), routes.AssignmentPatchHandler(services))
 	}
 
 	return r
 }
 
 func init() {
-	fmt.Printf("Reading configs from env...\n")
 	err := godotenv.Load()
+	logger.InitLogger()
+	logger.Info("Log location", zap.Any("log_location", os.Getenv("LOG_LOC")))
+	logger.Info("Loading env file...")
 	if err != nil {
-		fmt.Printf("unable to load env file, %s\n", err)
+		logger.Error("unable to load env file", zap.Any("error", err))
 	} else {
-		fmt.Print("Loaded env file successfully\n")
+		logger.Info("Loaded env file successfully")
 	}
 }
 
 func loadDefaultAccounts(defaultUsers config.DefaultUsers, s services.APIServices) {
 	if err := s.Database.Ping(); err != nil {
-		fmt.Println("DB is unavailable, cannot load default users")
+		logger.Warn("DB is unavailable, cannot load default users")
 		return
 	}
 
 	file, err := os.Open(defaultUsers.Path)
 	if err != nil {
-		fmt.Println("Error opening file:", err)
+		logger.Error("Error opening file", zap.Any("error", err))
 		return
 	}
 
 	defer func(file *os.File) {
 		err := file.Close()
 		if err != nil {
-			fmt.Println("Error closing file:", err)
+			logger.Error("Error closing file", zap.Any("error", err))
 		}
 	}(file)
 
@@ -67,7 +72,7 @@ func loadDefaultAccounts(defaultUsers config.DefaultUsers, s services.APIService
 
 	_, err = csvReader.Read()
 	if err != nil {
-		fmt.Println("Error reading header:", err)
+		logger.Error("Error reading header", zap.Any("error", err))
 		return
 	}
 
@@ -77,19 +82,19 @@ func loadDefaultAccounts(defaultUsers config.DefaultUsers, s services.APIService
 			if err == io.EOF {
 				break
 			}
-			fmt.Println("Error reading record:", err)
+			logger.Error("Error reading record", zap.Any("error", err))
 			return
 		}
 
 		passwordHash, hashError := s.AccountsService.HashPassword(record[3])
 		if hashError != nil {
-			fmt.Printf("Hashing password failed, %s\n", hashError)
+			logger.Error("Hashing password failed, %s\n", zap.Any("error", err))
 		} else {
 			account, accountFindError := s.AccountsService.GetAccountByEmail(record[2])
 
 			if accountFindError != nil {
-				fmt.Printf("Account does not exists, %s\n", accountFindError)
-				fmt.Println("Creating new account")
+				logger.Warn("Account does not exists, %s\n", zap.Any("error", accountFindError))
+				logger.Info("Creating new account")
 				account = models.Account{
 					FirstName: record[0],
 					LastName:  record[1],
@@ -98,28 +103,35 @@ func loadDefaultAccounts(defaultUsers config.DefaultUsers, s services.APIService
 				}
 				accountCreationError := s.AccountsService.AddAccount(account)
 				if accountCreationError != nil {
-					fmt.Printf("Failed creating a default account, %s\n", accountCreationError)
+					logger.Warn("Failed creating a default account, %s\n", zap.Any("error", accountCreationError))
 					continue
 				}
-				fmt.Printf("Successfully created a default account for %s\n", record[0])
+				logger.Info("Successfully created a default account", zap.Any("user", record[0]))
 			} else {
-				fmt.Printf("Account already exists, %s\n", account)
+				logger.Info("Account already exists", zap.Any("account", account))
 			}
 		}
 	}
 }
 
 func main() {
+	logger.Info("Configuring the application")
 	configs := config.GetConfigs()
+
+	logger.Info("Initializing application services")
 	s := services.APIServices{}
 	s.LoadServices(configs)
+
 	//Load default accounts
+	logger.Info("Creating default users for the system")
 	loadDefaultAccounts(configs.DefaultUsers, s)
 
+	logger.Info("Setting up Gin logger")
 	r := SetupGinRouter(s)
 
+	logger.Info("Starting Gin webserver")
 	err := r.Run(configs.ServerConfig.Host)
 	if err != nil {
-		panic("failed to start Gin server: " + err.Error())
+		logger.Fatal("Failed to start Gin server", zap.Error(err))
 	}
 }

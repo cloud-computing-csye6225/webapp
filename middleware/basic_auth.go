@@ -1,22 +1,24 @@
 package middleware
 
 import (
-	"fmt"
 	"github.com/gin-gonic/gin"
+	"go.uber.org/zap"
 	"net/http"
+	"webapp/logger"
 	"webapp/services"
 )
 
 func BasicAuth(services services.APIServices) gin.HandlerFunc {
 	return func(context *gin.Context) {
 		email, password, ok := context.Request.BasicAuth()
-		fmt.Printf("In middleware email=%s password=%s ok=%v\n", email, password, ok)
+		logger.Info("Authenticating user", zap.Any("user email", email))
 		if !ok {
+			logger.Error("Unable to authenticate user, failed to parse auth string")
 			context.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "Invalid base64 encoding"})
 		} else {
 			account, err := services.AccountsService.GetAccountByEmail(email)
 			if err != nil {
-				fmt.Printf("Unable to get account with email %s, %s\n", email, err)
+				logger.Error("Unable to get account with email", zap.Error(err))
 				context.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "unable to find username"})
 			} else {
 				success := services.AccountsService.CheckPasswordHash(password, account.Password)
@@ -24,7 +26,7 @@ func BasicAuth(services services.APIServices) gin.HandlerFunc {
 					context.Set("loggedInAccount", account)
 					context.Next()
 				} else {
-					fmt.Println("Authentication failed")
+					logger.Error("Authentication failed")
 					context.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "Authorization failed"})
 				}
 			}
