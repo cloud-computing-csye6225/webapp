@@ -11,6 +11,7 @@ import (
 	"testing"
 	"webapp/config"
 	"webapp/db"
+	"webapp/logger"
 	"webapp/routes"
 )
 
@@ -27,6 +28,7 @@ func loadEnv() {
 
 func TestHealthzRouteWithGET(t *testing.T) {
 	loadEnv()
+	logger.InitLogger()
 	configs := config.GetConfigs()
 	pgDB := &db.PostgresDB{}
 	err := pgDB.InitDatabase(configs.DBConfig)
