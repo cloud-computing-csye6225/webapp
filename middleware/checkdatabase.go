@@ -10,6 +10,7 @@ import (
 
 func CheckDB(services services.APIServices) gin.HandlerFunc {
 	return func(c *gin.Context) {
+		logger.Info("Checking if DB is active")
 		err := services.Database.Ping()
 		if err != nil {
 			logger.Error("Unable to establish connection with DB, aborting the request", zap.Error(err))

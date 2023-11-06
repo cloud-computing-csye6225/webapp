@@ -24,14 +24,15 @@ func SetupGinRouter(services services.APIServices) *gin.Engine {
 
 	v1 := r.Group("/v1")
 	{
-		v1.POST("/assignments", middleware.CheckDB(services), middleware.BasicAuth(services), middleware.ValidateAssignmentsPayload(services), routes.AssignmentsPostHandler(services))
-		v1.GET("/assignments/:id", middleware.CheckDB(services), middleware.BasicAuth(services), routes.AssignmentGetByIDHandler(services))
-		v1.GET("/assignments", middleware.LogWebRequests(), middleware.CheckDB(services), middleware.BasicAuth(services), routes.AssignmentGetHandler(services))
-		v1.GET("/assignments/", middleware.LogWebRequests(), middleware.CheckDB(services), middleware.BasicAuth(services), routes.AssignmentGetHandler(services))
-		v1.PUT("/assignments/:id", middleware.LogWebRequests(), middleware.CheckDB(services), middleware.BasicAuth(services), middleware.ValidateAssignmentsPayload(services), routes.AssignmentPutHandler(services))
-		v1.DELETE("/assignments/:id", middleware.LogWebRequests(), middleware.CheckDB(services), middleware.BasicAuth(services), routes.AssignmentDeleteHandler(services))
-		v1.PATCH("/assignments/:id", middleware.LogWebRequests(), middleware.CheckDB(services), middleware.BasicAuth(services), routes.AssignmentPatchHandler(services))
-		v1.PATCH("/assignments/", middleware.LogWebRequests(), middleware.CheckDB(services), middleware.BasicAuth(services), routes.AssignmentPatchHandler(services))
+		v1.Use(middleware.CheckDB(services), middleware.BasicAuth(services))
+		v1.POST("/assignments", middleware.ValidateAssignmentsPayload(services), routes.AssignmentsPostHandler(services))
+		v1.GET("/assignments/:id", routes.AssignmentGetByIDHandler(services))
+		v1.GET("/assignments", routes.AssignmentGetHandler(services))
+		v1.GET("/assignments/", routes.AssignmentGetHandler(services))
+		v1.PUT("/assignments/:id", middleware.ValidateAssignmentsPayload(services), routes.AssignmentPutHandler(services))
+		v1.DELETE("/assignments/:id", routes.AssignmentDeleteHandler(services))
+		v1.PATCH("/assignments/:id", routes.AssignmentPatchHandler(services))
+		v1.PATCH("/assignments/", routes.AssignmentPatchHandler(services))
 	}
 
 	return r
@@ -122,7 +123,6 @@ func main() {
 	s := services.APIServices{}
 	s.LoadServices(configs)
 
-	//Load default accounts
 	logger.Info("Creating default users for the system")
 	loadDefaultAccounts(configs.DefaultUsers, s)
 

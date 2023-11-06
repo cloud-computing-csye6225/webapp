@@ -18,7 +18,7 @@ func InitLogger() *zap.Logger {
 	once.Do(func() {
 		stdout := zapcore.AddSync(os.Stdout)
 		file := zapcore.AddSync(&lumberjack.Logger{
-			Filename:   "D:/CSYE6225/app/logs/app.log",
+			Filename:   os.Getenv("LOG_LOC"),
 			MaxSize:    1,
 			MaxBackups: 10,
 			MaxAge:     14,
