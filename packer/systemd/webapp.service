@@ -8,12 +8,7 @@ User={{USER}}
 Group={{GROUP}}
 EnvironmentFile={{ENVFILE}}
 ExecStart={{EXECFILE}}
-
 Restart=on-failure
-
-StandardOutput={{APPLOG}}
-StandardError={{ERRLOG}}
-SyslogIdentifier=webappservice
 
 [Install]
 WantedBy=cloud-init.target

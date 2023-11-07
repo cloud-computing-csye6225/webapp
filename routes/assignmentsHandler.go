@@ -10,10 +10,12 @@ import (
 	"webapp/logger"
 	"webapp/models"
 	"webapp/services"
+	"webapp/utils"
 )
 
 func AssignmentsPostHandler(services services.APIServices) gin.HandlerFunc {
 	return func(c *gin.Context) {
+		utils.StatIncrement("CreateAssignment", 1)
 		var assignment models.Assignment
 
 		if err := c.Bind(&assignment); err != nil {
@@ -54,6 +56,7 @@ func AssignmentsPostHandler(services services.APIServices) gin.HandlerFunc {
 
 func AssignmentGetHandler(services services.APIServices) gin.HandlerFunc {
 	return func(c *gin.Context) {
+		utils.StatIncrement("GetAssignments", 1)
 		all, err := io.ReadAll(c.Request.Body)
 		if err != nil {
 			logger.Error("Error while reading the body", zap.Error(err))
@@ -80,6 +83,7 @@ func AssignmentGetHandler(services services.APIServices) gin.HandlerFunc {
 
 func AssignmentGetByIDHandler(services services.APIServices) gin.HandlerFunc {
 	return func(c *gin.Context) {
+		utils.StatIncrement("GetAssignmentByID", 1)
 		// Check for body
 		all, err := io.ReadAll(c.Request.Body)
 		if err != nil {
@@ -118,6 +122,7 @@ func AssignmentGetByIDHandler(services services.APIServices) gin.HandlerFunc {
 
 func AssignmentPutHandler(services services.APIServices) gin.HandlerFunc {
 	return func(c *gin.Context) {
+		utils.StatIncrement("UpdateAssignment", 1)
 		// Get params
 		assignmentID := c.Param("id")
 
@@ -173,6 +178,8 @@ func AssignmentPutHandler(services services.APIServices) gin.HandlerFunc {
 
 func AssignmentDeleteHandler(services services.APIServices) gin.HandlerFunc {
 	return func(c *gin.Context) {
+		utils.StatIncrement("DeleteAssignment", 1)
+
 		// Check if body is empty
 		all, err := io.ReadAll(c.Request.Body)
 		if err != nil {
@@ -230,6 +237,8 @@ func AssignmentDeleteHandler(services services.APIServices) gin.HandlerFunc {
 
 func AssignmentPatchHandler(services services.APIServices) gin.HandlerFunc {
 	return func(c *gin.Context) {
+		utils.StatIncrement("InvalidHandler", 1)
+
 		logger.Warn("Method not allowed")
 		c.JSON(http.StatusMethodNotAllowed, gin.H{"error": "Method not allowed"})
 	}

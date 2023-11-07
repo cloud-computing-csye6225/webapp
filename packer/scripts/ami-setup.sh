@@ -9,6 +9,10 @@ sudo apt-get update -y
 sudo apt-get upgrade -y
 sudo apt-get clean -y
 
+# Install cloudwatch agent
+wget -P /tmp/ https://amazoncloudwatch-agent.s3.amazonaws.com/debian/amd64/latest/amazon-cloudwatch-agent.deb
+sudo dpkg -i -E /tmp/amazon-cloudwatch-agent.deb
+
 # Create application user
 sudo groupadd csye6225
 sudo useradd -s /bin/false -g csye6225 -d /opt/webapp -m webapp
@@ -24,6 +28,7 @@ sudo tar -xvf /tmp/webapp.tar
 sudo mv ./webapp /opt/webapp/bin/
 sudo mv ./users.csv /opt/webapp/data/
 sudo mv ./webapp.service /etc/systemd/system/
+sudo mv ./webapp.json /opt/aws/amazon-cloudwatch-agent/etc/
 
 # Set permissions
 sudo mkdir /var/log/webapp
