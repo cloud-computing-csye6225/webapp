@@ -20,6 +20,12 @@ type ServerConfig struct {
 	GinMode string
 }
 
+type StatsDConfig struct {
+	Host          string
+	Port          string
+	MaxPacketSize int
+}
+
 type DefaultUsers struct {
 	Path string
 }
@@ -28,6 +34,7 @@ type Config struct {
 	DBConfig     DatabaseConfig
 	ServerConfig ServerConfig
 	DefaultUsers DefaultUsers
+	StatsDConfig StatsDConfig
 }
 
 func GetConfigs() Config {
@@ -43,6 +50,11 @@ func GetConfigs() Config {
 		ServerConfig: ServerConfig{
 			Host:    getEnvVariable("SERVERPORT", ":8080"),
 			GinMode: getEnvVariable("GIN_MODE", "debug"),
+		},
+		StatsDConfig: StatsDConfig{
+			Host:          getEnvVariable("STATSD_HOST", "localhost"),
+			Port:          getEnvVariable("STATSD_PORT", "8125"),
+			MaxPacketSize: getEnvVariableAsInt("STATSD_PACKET_SIZE", 1400),
 		},
 		DefaultUsers: DefaultUsers{
 			Path: getEnvVariable("DEFAULTUSERS", ""),

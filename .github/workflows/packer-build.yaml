@@ -68,10 +68,11 @@ jobs:
           | sed "s|{{ERRLOG}}|$ERRLOG|" \
           > ./packer/systemd/webapp.service
 
-      - name: Build application and users.csv
+      - name: Build and pack application artifacts
         run: |
           mkdir builds
           mv ./packer/systemd/webapp.service ./builds/
+          mv ./packer/cloudwatch/webapp.json ./builds/
           ls -la ./builds
           go build -o ./builds/webapp ./cmd/main.go
           cd ./builds/

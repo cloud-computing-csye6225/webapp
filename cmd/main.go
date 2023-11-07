@@ -13,6 +13,7 @@ import (
 	"webapp/models"
 	"webapp/routes"
 	"webapp/services"
+	"webapp/utils"
 )
 
 func SetupGinRouter(services services.APIServices) *gin.Engine {
@@ -120,6 +121,7 @@ func main() {
 	configs := config.GetConfigs()
 
 	logger.Info("Initializing application services")
+	utils.InitStatsdClient(configs)
 	s := services.APIServices{}
 	s.LoadServices(configs)
 

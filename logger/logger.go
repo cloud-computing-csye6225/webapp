@@ -61,14 +61,14 @@ func Info(msg string, fields ...zapcore.Field) {
 	logger.Info(msg, fields...)
 }
 func Debug(msg string, fields ...zapcore.Field) {
-	logger.Info(msg, fields...)
+	logger.Debug(msg, fields...)
 }
 func Warn(msg string, fields ...zapcore.Field) {
-	logger.Info(msg, fields...)
+	logger.Warn(msg, fields...)
 }
 func Error(msg string, fields ...zapcore.Field) {
-	logger.Info(msg, fields...)
+	logger.Error(msg, fields...)
 }
 func Fatal(msg string, fields ...zapcore.Field) {
-	logger.Info(msg, fields...)
+	logger.Fatal(msg, fields...)
 }
