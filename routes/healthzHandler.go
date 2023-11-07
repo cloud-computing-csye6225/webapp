@@ -12,7 +12,7 @@ import (
 
 func HealthzGetReqHandler(db db.Database) gin.HandlerFunc {
 	return func(context *gin.Context) {
-		utils.StatIncrement("UpdateAssignment", 1)
+		utils.StatIncrement("healthz", 1)
 		context.Header("Cache-Control", "no-store, no-cache, must-revalidate;")
 		if context.Request.Method == http.MethodGet {
 			querystring := context.Request.URL.RawQuery
