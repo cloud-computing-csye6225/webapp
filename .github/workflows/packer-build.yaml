@@ -26,7 +26,6 @@ jobs:
       - name: Check Go version
         run: go version
 
-
       - name: Set up PostgreSQL
         run: |
           sudo apt-get update
