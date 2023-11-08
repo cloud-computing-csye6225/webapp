@@ -171,8 +171,9 @@ func AssignmentPutHandler(services services.APIServices) gin.HandlerFunc {
 			c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 			return
 		}
+		logger.Info("Updated the assignment", zap.Any("oldAssignment", assignment), zap.Any("updatedAssignment", updatedAssignment))
 		logger.Info("Assignment updated successfully")
-		c.JSON(http.StatusOK, updatedAssignment)
+		c.String(http.StatusNoContent, "")
 	}
 }
 
