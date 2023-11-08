@@ -5,6 +5,7 @@ import (
 	"go.uber.org/zap"
 	"io"
 	"net/http"
+	"time"
 	"webapp/db"
 	"webapp/logger"
 	"webapp/utils"
@@ -24,7 +25,10 @@ func HealthzGetReqHandler(db db.Database) gin.HandlerFunc {
 				logger.Warn("Query parameters/body is not allowed for healthz")
 				context.String(http.StatusBadRequest, "")
 			} else {
+				start := time.Now()
 				err := db.Ping()
+				elapsed := time.Since(start)
+				logger.Debug("Ping timing test in healthz", zap.Any("time", elapsed))
 				if err != nil {
 					context.String(http.StatusServiceUnavailable, "")
 					return

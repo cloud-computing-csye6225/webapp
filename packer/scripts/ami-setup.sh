@@ -21,7 +21,6 @@ sudo useradd -s /bin/false -g csye6225 -d /opt/webapp -m webapp
 sudo -u webapp mkdir /opt/webapp/bin
 sudo -u webapp mkdir /opt/webapp/conf
 sudo -u webapp mkdir /opt/webapp/data
-sudo -u webapp mkdir /opt/webapp/logs
 
 # Extract and move files
 sudo tar -xvf /tmp/webapp.tar
