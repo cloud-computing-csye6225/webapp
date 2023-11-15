@@ -42,6 +42,11 @@ build {
   sources = ["source.amazon-ebs.webapp-ami"]
 
   provisioner "file" {
+    source      = "./packer/cloudwatch/webapp.json"
+    destination = "/tmp/"
+  }
+
+  provisioner "file" {
     source      = "./builds/webapp.tar"
     destination = "/tmp/"
   }

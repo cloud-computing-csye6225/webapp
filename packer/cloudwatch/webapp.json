@@ -10,7 +10,7 @@
           {
             "file_path": "/var/log/webapp/app.log",
             "log_group_name": "csye6225",
-            "log_stream_name": "webapp"
+            "log_stream_name": "{instance_id}"
           }
         ]
       }
