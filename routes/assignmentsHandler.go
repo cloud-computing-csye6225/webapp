@@ -1,6 +1,7 @@
 package routes
 
 import (
+	"bytes"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 	"go.uber.org/zap"
@@ -16,6 +17,25 @@ import (
 func AssignmentsPostHandler(services services.APIServices) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		utils.StatIncrement("CreateAssignment", 1)
+
+		// Read the Body content
+		var body []byte
+		if c.Request.Body != nil {
+			body, _ = io.ReadAll(c.Request.Body)
+		}
+		// Restore the io.ReadCloser to its original state
+		c.Request.Body = io.NopCloser(bytes.NewBuffer(body))
+
+		isValid, validationErrors, err := utils.ValidateAssignmentInput(string(body))
+		if err != nil {
+			c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			return
+		}
+		if !isValid {
+			c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"errors": validationErrors})
+			return
+		}
+
 		var assignment models.Assignment
 
 		if err := c.Bind(&assignment); err != nil {
@@ -123,6 +143,26 @@ func AssignmentGetByIDHandler(services services.APIServices) gin.HandlerFunc {
 func AssignmentPutHandler(services services.APIServices) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		utils.StatIncrement("UpdateAssignment", 1)
+
+		// Read the Body content
+		var body []byte
+		if c.Request.Body != nil {
+			body, _ = io.ReadAll(c.Request.Body)
+		}
+
+		// Restore the io.ReadCloser to its original state
+		c.Request.Body = io.NopCloser(bytes.NewBuffer(body))
+
+		isValid, validationErrors, err := utils.ValidateAssignmentInput(string(body))
+		if err != nil {
+			c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			return
+		}
+		if !isValid {
+			c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"errors": validationErrors})
+			return
+		}
+
 		// Get params
 		assignmentID := c.Param("id")
 
