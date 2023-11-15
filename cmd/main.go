@@ -26,11 +26,11 @@ func SetupGinRouter(services services.APIServices) *gin.Engine {
 	v1 := r.Group("/v1")
 	{
 		v1.Use(middleware.CheckDB(services), middleware.BasicAuth(services))
-		v1.POST("/assignments", middleware.ValidateAssignmentsPayload(services), routes.AssignmentsPostHandler(services))
+		v1.POST("/assignments", routes.AssignmentsPostHandler(services))
 		v1.GET("/assignments/:id", routes.AssignmentGetByIDHandler(services))
 		v1.GET("/assignments", routes.AssignmentGetHandler(services))
 		v1.GET("/assignments/", routes.AssignmentGetHandler(services))
-		v1.PUT("/assignments/:id", middleware.ValidateAssignmentsPayload(services), routes.AssignmentPutHandler(services))
+		v1.PUT("/assignments/:id", routes.AssignmentPutHandler(services))
 		v1.DELETE("/assignments/:id", routes.AssignmentDeleteHandler(services))
 		v1.PATCH("/assignments/:id", routes.AssignmentPatchHandler(services))
 		v1.PATCH("/assignments/", routes.AssignmentPatchHandler(services))
