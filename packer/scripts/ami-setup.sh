@@ -22,12 +22,14 @@ sudo -u webapp mkdir /opt/webapp/bin
 sudo -u webapp mkdir /opt/webapp/conf
 sudo -u webapp mkdir /opt/webapp/data
 
-# Extract and move files
+# Move cloudwatch config file
+sudo mv ./webapp.json /opt/aws/amazon-cloudwatch-agent/etc/
+
+#Extract and move build artifacts
 sudo tar -xvf /tmp/webapp.tar
 sudo mv ./webapp /opt/webapp/bin/
 sudo mv ./users.csv /opt/webapp/data/
 sudo mv ./webapp.service /etc/systemd/system/
-sudo mv ./webapp.json /opt/aws/amazon-cloudwatch-agent/etc/
 
 # Set permissions
 sudo mkdir /var/log/webapp
