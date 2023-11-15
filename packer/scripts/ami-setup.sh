@@ -23,7 +23,7 @@ sudo -u webapp mkdir /opt/webapp/conf
 sudo -u webapp mkdir /opt/webapp/data
 
 # Move cloudwatch config file
-sudo mv ./webapp.json /opt/aws/amazon-cloudwatch-agent/etc/
+sudo mv /tmp/webapp.json /opt/aws/amazon-cloudwatch-agent/etc/
 
 #Extract and move build artifacts
 sudo tar -xvf /tmp/webapp.tar
