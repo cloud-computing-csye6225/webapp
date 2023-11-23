@@ -54,7 +54,7 @@ func (p *PostgresDB) InitDatabase(cfg config.DatabaseConfig) error {
 	})
 	if err == nil {
 		p.db = db
-		automigrateError := p.db.AutoMigrate(&models.Account{}, &models.Assignment{})
+		automigrateError := p.db.AutoMigrate(&models.Account{}, &models.Assignment{}, &models.Submission{})
 		if automigrateError != nil {
 			logger.Error("Unable to automigrate schemas", zap.Error(automigrateError))
 			return automigrateError
