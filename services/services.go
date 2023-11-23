@@ -12,9 +12,10 @@ type Services interface {
 }
 
 type APIServices struct {
-	Database          db.Database
-	AssignmentService *AssignmentService
-	AccountsService   *AccountsService
+	Database           db.Database
+	AssignmentService  *AssignmentService
+	AccountsService    *AccountsService
+	SubmissionsService *SubmissionsService
 }
 
 func (s *APIServices) LoadServices(configs config.Config) {
@@ -27,4 +28,5 @@ func (s *APIServices) LoadServices(configs config.Config) {
 	s.Database = d
 	s.AccountsService = NewAccountService(d)
 	s.AssignmentService = NewAssignmentService(d)
+	s.SubmissionsService = NewSubmissionsService(d)
 }
