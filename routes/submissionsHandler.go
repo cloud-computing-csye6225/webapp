@@ -55,11 +55,9 @@ func SubmissionsPostHandler(services services.APIServices) gin.HandlerFunc {
 				c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": err})
 				return
 			}
-			val, _ := services.SubmissionsService.GetSubmissionByID(submission.ID)
-			logger.Info("Assignment submitted successfully", zap.Any("submission", val))
 			c.JSON(http.StatusCreated, submission)
 		}
-		
+
 		return
 	}
 }
