@@ -2,8 +2,8 @@ package routes
 
 import (
 	"bytes"
+	"fmt"
 	"github.com/gin-gonic/gin"
-	"github.com/google/uuid"
 	"go.uber.org/zap"
 	"io"
 	"net/http"
@@ -68,6 +68,9 @@ func AssignmentsPostHandler(services services.APIServices) gin.HandlerFunc {
 				c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": err})
 				return
 			}
+			fmt.Printf("\n%v\n", assignment)
+			val, _ := services.AssignmentService.GetAssignmentByID(assignment.ID)
+			fmt.Printf("\n%v\n", val)
 			logger.Info("Assignment created successfully")
 			c.JSON(http.StatusCreated, assignment)
 		}
@@ -122,7 +125,7 @@ func AssignmentGetByIDHandler(services services.APIServices) gin.HandlerFunc {
 		assignmentID := c.Param("id")
 
 		// Get is UUID is invalid and sent bac request
-		if !IsValidUUID(assignmentID) {
+		if !utils.IsValidUUID(assignmentID) {
 			logger.Warn("Assignment UUID is invalid", zap.Any("assignmentID", assignmentID))
 			c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": "Invalid UUID"})
 			return
@@ -167,7 +170,7 @@ func AssignmentPutHandler(services services.APIServices) gin.HandlerFunc {
 		assignmentID := c.Param("id")
 
 		// Get is UUID is invalid and sent bac request
-		if !IsValidUUID(assignmentID) {
+		if !utils.IsValidUUID(assignmentID) {
 			logger.Warn("Assignment UUID is invalid", zap.Any("assignmentID", assignmentID))
 			c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": "Invalid UUID"})
 			return
@@ -239,7 +242,7 @@ func AssignmentDeleteHandler(services services.APIServices) gin.HandlerFunc {
 		assignmentID := c.Param("id")
 
 		// Get is UUID is invalid and sent bac request
-		if !IsValidUUID(assignmentID) {
+		if !utils.IsValidUUID(assignmentID) {
 			logger.Warn("Assignment UUID is invalid", zap.Any("assignmentID", assignmentID))
 			c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": "Invalid UUID"})
 			return
@@ -283,11 +286,6 @@ func AssignmentPatchHandler(services services.APIServices) gin.HandlerFunc {
 		logger.Warn("Method not allowed")
 		c.JSON(http.StatusMethodNotAllowed, gin.H{"error": "Method not allowed"})
 	}
-}
-
-func IsValidUUID(u string) bool {
-	_, err := uuid.Parse(u)
-	return err == nil
 }
 
 func isFutureTime(deadline time.Time) bool {
