@@ -41,6 +41,20 @@ const assignmentSchema = `
 	  "additionalProperties": false
 	}
 `
+const submissionSchema = `
+	{
+	  "type": "object",
+	  "properties": {
+		"submission_url": {
+		  "type": "string",
+          "format" : "uri",
+          "pattern": "^https?://"
+		}
+	  },
+	  "required": ["submission_url"],
+	  "additionalProperties": false
+	}
+`
 
 func ValidateAssignmentInput(data string) (bool, []string, error) {
 	schemaLoader := gojsonschema.NewStringLoader(assignmentSchema)
@@ -48,12 +62,12 @@ func ValidateAssignmentInput(data string) (bool, []string, error) {
 
 	result, err := gojsonschema.Validate(schemaLoader, payloadLoader)
 	if err != nil {
-		logger.Error("Failed validating the schema", zap.Error(err))
+		logger.Error("Failed validating the assignment schema", zap.Error(err))
 		return false, nil, err
 	}
 
 	if result.Valid() {
-		logger.Info("The incoming payload is VALID")
+		logger.Info("The incoming assignment payload is VALID")
 		return true, nil, nil
 	} else {
 		errors := result.Errors()
@@ -63,8 +77,33 @@ func ValidateAssignmentInput(data string) (bool, []string, error) {
 			errorSlice = append(errorSlice, fmt.Sprintf("%v, %v", errors[i].Field(), errors[i].Description()))
 			fmt.Printf("validation error: %v - %v\n", errors[i].Field(), errors[i].Description())
 		}
-		logger.Warn("The incoming payload is INVALID", zap.Any("Validation errors", errorSlice))
+		logger.Warn("The incoming assignment payload is INVALID", zap.Any("Validation errors", errorSlice))
 		return false, errorSlice, nil
 	}
+}
 
+func ValidateSubmissionInput(data string) (bool, []string, error) {
+	schemaLoader := gojsonschema.NewStringLoader(submissionSchema)
+	payloadLoader := gojsonschema.NewStringLoader(data)
+
+	result, err := gojsonschema.Validate(schemaLoader, payloadLoader)
+	if err != nil {
+		logger.Error("Failed validating the submission schema", zap.Error(err))
+		return false, nil, err
+	}
+
+	if result.Valid() {
+		logger.Info("The incoming submission payload is VALID")
+		return true, nil, nil
+	} else {
+		errors := result.Errors()
+		var errorSlice []string
+
+		for i := 0; i < len(errors); i++ {
+			errorSlice = append(errorSlice, fmt.Sprintf("%v, %v", errors[i].Field(), errors[i].Description()))
+			fmt.Printf("validation error: %v - %v\n", errors[i].Field(), errors[i].Description())
+		}
+		logger.Warn("The submission incoming payload is INVALID", zap.Any("Validation errors", errorSlice))
+		return false, errorSlice, nil
+	}
 }

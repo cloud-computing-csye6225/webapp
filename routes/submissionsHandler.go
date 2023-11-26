@@ -1,12 +1,11 @@
 package routes
 
 import (
-	"context"
+	"bytes"
 	"encoding/json"
-	"github.com/aws/aws-sdk-go-v2/config"
-	"github.com/aws/aws-sdk-go-v2/service/sns"
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
+	"io"
 	"net/http"
 	"webapp/logger"
 	"webapp/models"
@@ -17,6 +16,24 @@ import (
 func SubmissionsPostHandler(services services.APIServices) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		utils.StatIncrement("CreateSubmission", 1)
+
+		// Read the Body content
+		var body []byte
+		if c.Request.Body != nil {
+			body, _ = io.ReadAll(c.Request.Body)
+		}
+		// Restore the io.ReadCloser to its original state
+		c.Request.Body = io.NopCloser(bytes.NewBuffer(body))
+
+		isValid, validationErrors, err := utils.ValidateSubmissionInput(string(body))
+		if err != nil {
+			c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			return
+		}
+		if !isValid {
+			c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"errors": validationErrors})
+			return
+		}
 
 		var submission models.Submission
 
@@ -53,7 +70,26 @@ func SubmissionsPostHandler(services services.APIServices) gin.HandlerFunc {
 
 		if exists {
 			submission.AccountID = account.ID
-			err := services.SubmissionsService.CreateSubmission(&submission)
+
+			isAttemptValid, err := services.SubmissionsService.CheckSubmissionAttemptValidity(submission, assignment.NumOfAttempts)
+			if err != nil {
+				logger.Error("Failed to check attempt validity", zap.Error(err))
+				c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": err})
+				return
+			} else {
+				isSubmissionOnTime := services.SubmissionsService.CheckForLateSubmission(assignment.Deadline)
+
+				if !isSubmissionOnTime {
+					c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": "Cannot submit assignment after the deadline"})
+					return
+				}
+				if !isAttemptValid {
+					c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": "Submission attempts exceeded for this assignment"})
+					return
+				}
+			}
+
+			err = services.SubmissionsService.CreateSubmission(&submission)
 			if err != nil {
 				logger.Error("Failed to submit assignment", zap.Error(err))
 				c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": err})
@@ -74,35 +110,9 @@ func SubmissionsPostHandler(services services.APIServices) gin.HandlerFunc {
 				return
 			}
 
-			PublishSubmissionInSNS(string(marshal))
+			services.AWSService.PublishSubmissionToSNS(string(marshal))
 			c.JSON(http.StatusCreated, submission)
 		}
-
 		return
 	}
-}
-
-func PublishSubmissionInSNS(submission string) {
-	arn := "arn:aws:sns:us-east-1:089849603791:webapp-NoS"
-	cfg, err := config.LoadDefaultConfig(context.TODO())
-
-	if err != nil {
-		logger.Error("configuration error, ", zap.Any("error", err.Error()))
-		return
-	}
-
-	client := sns.NewFromConfig(cfg)
-
-	input := &sns.PublishInput{
-		Message:  &submission,
-		TopicArn: &arn,
-	}
-
-	result, err := client.Publish(context.TODO(), input)
-	if err != nil {
-		logger.Error("Got an error publishing the message", zap.Any("error", err))
-		return
-	}
-
-	logger.Info("Successfully sent submission to SNS", zap.Any("MessageID", *result.MessageId))
 }

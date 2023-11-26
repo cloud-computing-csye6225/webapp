@@ -2,6 +2,7 @@ package services
 
 import (
 	"go.uber.org/zap"
+	"time"
 	"webapp/db"
 	"webapp/logger"
 	"webapp/models"
@@ -32,4 +33,24 @@ func (ss SubmissionsService) GetSubmissionByID(submissionId string) (models.Subm
 		return submission, err
 	}
 	return submission, nil
+}
+
+func (ss SubmissionsService) CheckSubmissionAttemptValidity(submission models.Submission, allowedAttempts int) (bool, error) {
+	var submissions []models.Submission
+
+	if err := ss.db.GetConnection().Where("assignment_id=?", submission.AssignmentID).Find(&submissions).Error; err != nil {
+		logger.Error("Failed to check attempt validity", zap.Any("error", err))
+		return false, err
+	}
+
+	if len(submissions)+1 > allowedAttempts {
+		return false, nil
+	} else {
+		return true, nil
+	}
+}
+
+func (ss SubmissionsService) CheckForLateSubmission(deadline time.Time) bool {
+	currentTime := time.Now()
+	return deadline.After(currentTime)
 }
