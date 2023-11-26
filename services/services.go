@@ -16,6 +16,7 @@ type APIServices struct {
 	AssignmentService  *AssignmentService
 	AccountsService    *AccountsService
 	SubmissionsService *SubmissionsService
+	AWSService         *AWSService
 }
 
 func (s *APIServices) LoadServices(configs config.Config) {
@@ -29,4 +30,5 @@ func (s *APIServices) LoadServices(configs config.Config) {
 	s.AccountsService = NewAccountService(d)
 	s.AssignmentService = NewAssignmentService(d)
 	s.SubmissionsService = NewSubmissionsService(d)
+	s.AWSService = NewAWSService(&configs.AWSConfig)
 }

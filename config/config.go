@@ -30,11 +30,17 @@ type DefaultUsers struct {
 	Path string
 }
 
+type AWSConfig struct {
+	SNSArn    string
+	AWSRegion string
+}
+
 type Config struct {
 	DBConfig     DatabaseConfig
 	ServerConfig ServerConfig
 	DefaultUsers DefaultUsers
 	StatsDConfig StatsDConfig
+	AWSConfig    AWSConfig
 }
 
 func GetConfigs() Config {
@@ -51,13 +57,17 @@ func GetConfigs() Config {
 			Host:    getEnvVariable("SERVERPORT", ":8080"),
 			GinMode: getEnvVariable("GIN_MODE", "debug"),
 		},
+		DefaultUsers: DefaultUsers{
+			Path: getEnvVariable("DEFAULTUSERS", ""),
+		},
 		StatsDConfig: StatsDConfig{
 			Host:          getEnvVariable("STATSD_HOST", "localhost"),
 			Port:          getEnvVariable("STATSD_PORT", "8125"),
 			MaxPacketSize: getEnvVariableAsInt("STATSD_PACKET_SIZE", 1400),
 		},
-		DefaultUsers: DefaultUsers{
-			Path: getEnvVariable("DEFAULTUSERS", ""),
+		AWSConfig: AWSConfig{
+			SNSArn:    getEnvVariable("SNS_ARN", ""),
+			AWSRegion: getEnvVariable("AWS_REGION", "us-east-1"),
 		},
 	}
 }
