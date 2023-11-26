@@ -100,9 +100,6 @@ func PublishSubmissionInSNS(submission string) {
 
 	result, err := client.Publish(context.TODO(), input)
 	if err != nil {
-		return
-	}
-	if err != nil {
 		logger.Error("Got an error publishing the message", zap.Any("error", err))
 		return
 	}
