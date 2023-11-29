@@ -123,3 +123,10 @@ func SubmissionsPostHandler(services services.APIServices) gin.HandlerFunc {
 		return
 	}
 }
+
+func SubmissionInvalidHandler() gin.HandlerFunc {
+	return func(context *gin.Context) {
+		context.Status(http.StatusMethodNotAllowed)
+		return
+	}
+}
