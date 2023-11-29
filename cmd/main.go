@@ -35,8 +35,11 @@ func SetupGinRouter(services services.APIServices) *gin.Engine {
 		v1.PATCH("/assignments/:id", routes.AssignmentPatchHandler(services))
 		v1.PATCH("/assignments/", routes.AssignmentPatchHandler(services))
 		v1.POST("/assignments/:id/submission", routes.SubmissionsPostHandler(services))
+		v1.GET("/assignments/:id/submission", routes.SubmissionInvalidHandler())
+		v1.PUT("/assignments/:id/submission", routes.SubmissionInvalidHandler())
+		v1.PATCH("/assignments/:id/submission", routes.SubmissionInvalidHandler())
+		v1.DELETE("/assignments/:id/submission", routes.SubmissionInvalidHandler())
 	}
-
 	return r
 }
 
