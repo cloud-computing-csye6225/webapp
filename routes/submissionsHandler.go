@@ -7,6 +7,7 @@ import (
 	"go.uber.org/zap"
 	"io"
 	"net/http"
+	"time"
 	"webapp/logger"
 	"webapp/models"
 	"webapp/services"
@@ -97,13 +98,19 @@ func SubmissionsPostHandler(services services.APIServices) gin.HandlerFunc {
 			}
 
 			messageToLambda := struct {
-				SubmissionID  string
-				SubmissionUrl string
-				EmailID       string
+				SubmissionID   string
+				AssignmentName string
+				FirstName      string
+				EmailID        string
+				SubmissionUrl  string
+				SubmissionTime time.Time
 			}{
-				SubmissionID:  submission.ID,
-				SubmissionUrl: submission.SubmissionURL,
-				EmailID:       account.Email,
+				SubmissionID:   submission.ID,
+				AssignmentName: assignment.Name,
+				FirstName:      account.FirstName,
+				EmailID:        account.Email,
+				SubmissionUrl:  submission.SubmissionURL,
+				SubmissionTime: submission.SubmissionCreated,
 			}
 			marshal, err := json.Marshal(messageToLambda)
 			if err != nil {
