@@ -81,11 +81,11 @@ func SubmissionsPostHandler(services services.APIServices) gin.HandlerFunc {
 				isSubmissionOnTime := services.SubmissionsService.CheckForLateSubmission(assignment.Deadline)
 
 				if !isSubmissionOnTime {
-					c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": "Cannot submit assignment after the deadline"})
+					c.AbortWithStatusJSON(http.StatusForbidden, gin.H{"error": "Cannot submit assignment after the deadline"})
 					return
 				}
 				if !isAttemptValid {
-					c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": "Submission attempts exceeded for this assignment"})
+					c.AbortWithStatusJSON(http.StatusForbidden, gin.H{"error": "Submission attempts exceeded for this assignment"})
 					return
 				}
 			}
