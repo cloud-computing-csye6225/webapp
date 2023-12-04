@@ -100,3 +100,40 @@ jobs:
           PKR_AWS_SRC_AMI: ${{ vars.PKR_AWS_SRC_AMI }}
           PKR_AWS_SSH_USERNAME: ${{ vars.PKR_AWS_SSH_USERNAME }}
         run: "packer build ./packer/debian12-ami.pkr.hcl"
+
+      - name: AWS CLI configuration for demo
+        run: |
+          aws configure set aws_access_key_id $DEMO_AWS_ACCESS_KEY_ID --profile demo
+          aws configure set aws_secret_access_key $DEMO_AWS_SECRET_ACCESS_KEY --profile demo
+          aws configure set region $DEMO_AWS_REGION --profile demo
+        env:
+          DEMO_AWS_ACCESS_KEY_ID: ${{ secrets.DEMO_AWS_ACCESS_KEY_ID }}
+          DEMO_AWS_REGION: ${{ vars.DEMO_AWS_REGION }}
+          DEMO_AWS_SECRET_ACCESS_KEY: ${{ secrets.DEMO_AWS_SECRET_ACCESS_KEY }}
+
+      - name: Get latest AMI and launch template source version
+        run: |
+          ami_id=$(aws ec2 describe-images --owners 089849603791 --query 'Images | sort_by(@, &CreationDate) | [-1] | [ImageId][0]' --output text --profile demo)
+          lt_src_version=$(aws ec2 describe-launch-template-versions --launch-template-name webapp-launchTemplate --versions --query 'LaunchTemplateVersions | sort_by(@, &VersionNumber) | [-1] | VersionNumber' --output text --profile demo)
+      
+      - name: Update launch template
+        run: |
+          echo "Creating new launch template version, with version $lt_src_version as source version"
+          lt_updated_version=$(aws ec2 create-launch-template-version --launch-template-name webapp-launchTemplate --source-version $lt_src_version --launch-template-data "ImageId=$ami_id" --query 'LaunchTemplateVersion | VersionNumber' --output text --profile demo)
+          echo "Making the launch template with version $lt_updated_version as default version"
+          aws ec2 modify-launch-template --launch-template-name webapp-launchTemplate --default-version $lt_updated_version --profile demo
+
+      - name: Update autoscaling groups and refresh instances
+        run: |
+          echo "Refreshing the instances"
+          instance_refresh_id=$(aws autoscaling start-instance-refresh --auto-scaling-group-name webapp-autoscale-group --query "InstanceRefreshId" --output text --profile demo)
+          refresh_status = "Pending"
+          while [ $refresh_status == "Pending" ]; do
+            refresh_status=$(aws your-cli-command-to-check-refresh-status)
+            if [ $refresh_status == "Successful" ]; then
+              echo "Instance refresh is successful!"
+            else
+              echo "Instance refresh still in progress..."
+              sleep 5
+            fi
+          done
