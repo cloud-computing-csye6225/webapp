@@ -135,7 +135,7 @@ jobs:
           echo "Refreshing the instances"
           instance_refresh_id=$(aws autoscaling start-instance-refresh --auto-scaling-group-name webapp-autoscale-group --query "InstanceRefreshId" --output text --profile demo)
           refresh_status="Pending"
-          while [ "$refresh_status" == "Pending" ]; do
+          while [ "$refresh_status" == "Pending" ] || [ "$refresh_status" == "InProgress" ]; do
             refresh_status=$(aws autoscaling describe-instance-refreshes --auto-scaling-group-name webapp-autoscale-group --instance-refresh-ids $instance_refresh_id --query "InstanceRefreshes[0] | Status" --profile demo)
             if [ "$refresh_status" == "Successful" ]; then
               echo "Instance refresh is successful!"
