@@ -23,7 +23,7 @@ func SetupGinRouter(services services.APIServices) *gin.Engine {
 	r.Use(middleware.LogWebRequests())
 	r.Any("/healthz", routes.HealthzGetReqHandler(services.Database))
 
-	v1 := r.Group("/v2")
+	v1 := r.Group("/v1")
 	{
 		v1.Use(middleware.CheckDB(services), middleware.BasicAuth(services))
 		v1.POST("/assignments", routes.AssignmentsPostHandler(services))
