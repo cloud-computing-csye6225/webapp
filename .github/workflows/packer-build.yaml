@@ -115,28 +115,31 @@ jobs:
         id: latest-ami
         run: |
           ami_id=$(aws ec2 describe-images --owners 089849603791 --query 'Images | sort_by(@, &CreationDate) | [-1] | [ImageId][0]' --output text --profile demo)
-          lt_src_version=$(aws ec2 describe-launch-template-versions --launch-template-name webapp-launchTemplate --versions --query 'LaunchTemplateVersions | sort_by(@, &VersionNumber) | [-1] | VersionNumber' --output text --profile demo)
+          lt_src_version=$(aws ec2 describe-launch-template-versions --launch-template-name $LAUNCH_TEMPLATE_NAME --versions --query 'LaunchTemplateVersions | sort_by(@, &VersionNumber) | [-1] | VersionNumber' --output text --profile demo)
           echo "AMI_ID=$ami_id" >> $GITHUB_OUTPUT
           echo "LT_SRC_VERSION=$lt_src_version" >> $GITHUB_OUTPUT
+        env:
+          LAUNCH_TEMPLATE_NAME: ${{ vars.LAUNCH_TEMPLATE_NAME }}
 
       - name: Update launch template
         id: update-lt
         run: |
           echo "Creating new launch template version, with version $lt_src_version as source version"
-          lt_updated_version=$(aws ec2 create-launch-template-version --launch-template-name webapp-launchTemplate --source-version $LT_SRC_VERSION --launch-template-data "ImageId=$AMI_ID" --query 'LaunchTemplateVersion | VersionNumber' --output text --profile demo)
+          lt_updated_version=$(aws ec2 create-launch-template-version --launch-template-name $LAUNCH_TEMPLATE_NAME --source-version $LT_SRC_VERSION --launch-template-data "ImageId=$AMI_ID" --query 'LaunchTemplateVersion | VersionNumber' --output text --profile demo)
           echo "Making the launch template with version $lt_updated_version as default version"
           aws ec2 modify-launch-template --launch-template-name webapp-launchTemplate --default-version $lt_updated_version --profile demo
         env:
           AMI_ID: ${{ steps.latest-ami.outputs.AMI_ID }}
           LT_SRC_VERSION: ${{ steps.latest-ami.outputs.LT_SRC_VERSION }}
+          LAUNCH_TEMPLATE_NAME: ${{ vars.LAUNCH_TEMPLATE_NAME }}
 
       - name: Update autoscaling groups and refresh instances
         run: |
           echo "Refreshing the instances"
-          instance_refresh_id=$(aws autoscaling start-instance-refresh --auto-scaling-group-name webapp-autoscale-group --query "InstanceRefreshId" --output text --profile demo)
+          instance_refresh_id=$(aws autoscaling start-instance-refresh --auto-scaling-group-name $AUTOSCALING_GROUP_NAME --query "InstanceRefreshId" --output text --profile demo)
           refresh_status="Pending"
           while [ "$refresh_status" == "Pending" ] || [ "$refresh_status" == "InProgress" ]; do
-            refresh_status=$(aws autoscaling describe-instance-refreshes --auto-scaling-group-name webapp-autoscale-group --instance-refresh-ids $instance_refresh_id --query "InstanceRefreshes[0] | Status" --output text --profile demo)
+            refresh_status=$(aws autoscaling describe-instance-refreshes --auto-scaling-group-name $AUTOSCALING_GROUP_NAME --instance-refresh-ids $instance_refresh_id --query "InstanceRefreshes[0] | Status" --output text --profile demo)
             if [ "$refresh_status" == "Successful" ]; then
               echo "Instance refresh is successful!"
             else
@@ -144,3 +147,5 @@ jobs:
               sleep 5
             fi
           done
+        env:
+          AUTOSCALING_GROUP_NAME: ${{ vars.AUTOSCALING_GROUP_NAME }}
