@@ -142,10 +142,13 @@ jobs:
             refresh_status=$(aws autoscaling describe-instance-refreshes --auto-scaling-group-name $AUTOSCALING_GROUP_NAME --instance-refresh-ids $instance_refresh_id --query "InstanceRefreshes[0] | Status" --output text --profile demo)
             if [ "$refresh_status" == "Successful" ]; then
               echo "Instance refresh is successful!"
+              exit 0
             else
               echo "Instance refresh still in progress..."
               sleep 5
             fi
           done
+          exit 1
+
         env:
           AUTOSCALING_GROUP_NAME: ${{ vars.AUTOSCALING_GROUP_NAME }}
